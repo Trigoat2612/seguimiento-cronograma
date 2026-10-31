@@ -9,23 +9,26 @@ Aplicación web sobre Vercel Functions + Neon PostgreSQL para las **80 actividad
 - Control optimista de versiones para impedir sobrescrituras silenciosas desde varias sesiones.
 - API y fuente de datos centralizados en Neon; navegador sin `localStorage` como fuente de verdad.
 - Importación del JSON del tablero anterior y exportación de CSV/JSON.
-- Autenticación con contraseña administrativa, cookie firmada HttpOnly, SameSite=Strict y Secure.
+- Acceso directo al tablero sin contraseña administrativa ni cookies de sesión. El backend valida el origen de las solicitudes de edición (esto no sustituye un control de acceso).
 
 ## Configurar Vercel
 1. Conectar `Trigoat2612/seguimiento-cronograma` al proyecto existente `seguimiento-cronograma-2qnh` o confirmar que ya está vinculado.
 2. Colocar **estos archivos en la raíz del repositorio** (no dentro de otra carpeta). En Framework Preset usar **Other** y Output Directory sin establecer.
-3. Agregar en Settings > Environment Variables: `DATABASE_URL` (connection string **pooled** de Neon, servidor solamente), `ADMIN_PASSWORD` (al menos 12 caracteres) y `SESSION_SECRET` (al menos 32 caracteres aleatorios). No incluir las claves en Git ni variables `VITE_*`.
-4. Deploy y abrir la URL asignada por Vercel. Iniciar sesión y cambiar el estado de una actividad para comprobar persistencia.
+3. Agregar en Settings > Environment Variables: `DATABASE_URL` (cadena de conexión **pooled** de Neon, solo en el servidor). **No se necesitan** variables de contraseña ni secreto de sesión. No incluir las claves en Git ni variables `VITE_*`.
+4. Desplegar y abrir la URL asignada por Vercel. La aplicación muestra el tablero directamente; cambiar el estado de una actividad y refrescar para comprobar su persistencia en Neon.
 
 ## Estado de Neon
 En la rama **production** `br-misty-firefly-b52a21f6` del proyecto `super-credit-91949836`, base `neondb`, se creó el esquema aislado `seguimiento_cronograma` y se cargaron las 80 actividades. **No volver a ejecutar la carga inicial manualmente**; el esquema SQL de `db/001_schema.sql` queda para reproducir la estructura en otro entorno si se necesitara. Los datos reales ya están en la base indicada.
 
 ## Precauciones
-- La contraseña compartida permite una única identidad administrativa. Para distintos usuarios y atribución individual verificable, migrar a autenticación por usuario antes de repartir el acceso.
+- **Advertencia:** sin autenticación a nivel de aplicación, cualquier persona que acceda al sitio puede leer y modificar el seguimiento. Para uso interno, activar Deployment Protection o algún control de acceso de Vercel. La validación del encabezado Origin no impide solicitudes directas. La bitácora registra `tablero web`, no la identidad real de cada editor.
 - El historial es de cambios registrados por el tablero, no representa evidencia de ejecución de GTI. Los enlaces a archivos deben dirigir a un repositorio con permisos institucionales.
 - No usar este tablero para cargar expedientes ni documentos judiciales sensibles. Registra **solo seguimiento de actividades**.
 - El cronograma es propuesto; horas y volúmenes deben confirmarse en pruebas.
 - La lógica `api/activities.js` asume el esquema de Neon preparado. No otorga acceso directo a Postgres al navegador.
 
 ## Desarrollo local
-`npm install` y exportar las variables de entorno. `npm run dev` en `http://localhost:3000`. La cookie `Secure` requiere HTTPS, por lo que para probar el inicio de sesión es preferible el despliegue HTTPS de Vercel.
+`npm install` y exportar las variables de entorno. `npm run dev` en `http://localhost:3000`. Se utiliza el mismo backend para pruebas locales; las solicitudes que modifican datos deben proceder del origen de la aplicación.
+
+## Variables retiradas
+- `ADMIN_PASSWORD` y `SESSION_SECRET` fueron eliminadas del código, la interfaz y el ejemplo de configuración. Si están registradas como variables antiguas en Vercel, se pueden eliminar de ese proyecto después de confirmar que está desplegada esta versión.

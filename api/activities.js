@@ -19,11 +19,11 @@ export default async function handler(req,res){
      notes=COALESCE(${nextNote},notes),
      completed_at=CASE WHEN COALESCE(${nextStatus},status)='Completada' THEN COALESCE(completed_at,now()) ELSE NULL END,
      started_at=CASE WHEN COALESCE(${nextStatus},status)='En curso' THEN COALESCE(started_at,now()) ELSE started_at END,
-     version=version+1,updated_at=now(),updated_by='administrador'
+     version=version+1,updated_at=now(),updated_by='tablero web'
    WHERE id=${id} AND version=${version} AND (status IS DISTINCT FROM COALESCE(${nextStatus},status) OR notes IS DISTINCT FROM COALESCE(${nextNote},notes))
    RETURNING id,status,notes,version,updated_at,completed_at
   ),logged AS (INSERT INTO seguimiento_cronograma.activity_history(activity_id,status,notes,version,changed_by)
-      SELECT id,status,notes,version,'administrador' FROM changed RETURNING activity_id)
+      SELECT id,status,notes,version,'tablero web' FROM changed RETURNING activity_id)
   SELECT c.id,c.status,c.notes AS note,c.version,c.updated_at AS updated,c.completed_at AS completed FROM changed c`;
   if(rows.length)return json(res,200,{activity:rows[0]});
   const existing=await sql`SELECT id,status,notes AS note,version,updated_at AS updated,completed_at AS completed FROM seguimiento_cronograma.activities WHERE id=${id}`;
