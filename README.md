@@ -1,34 +1,45 @@
-# Seguimiento de migración SIJ → EJE No Penal
+# Centro de control · Operaciones de salida SIJ → EJE No Penal
 
-Aplicación web sobre Vercel Functions + Neon PostgreSQL para las **80 actividades** de la hoja de ruta propuesta del 3 al 9 de noviembre de 2026.
+Evolución del repositorio `Trigoat2612/seguimiento-cronograma` para el **Plan de Operaciones de Salida v2.0**, CSJ Lima Este, especialidad Laboral (NLPT), 10/11/2026. La versión anterior usaba 80 actividades de una propuesta del 3–9/11/2026; **esta versión trabaja exclusivamente con las 23 filas del cronograma oficial, páginas 11–12**.
 
-## Implementado
-- Cronograma Gantt, iconos por tipo de acción, KPIs por estado/día, vista de flujo y recuperación alternativa.
-- Estados: pendiente, en curso, completada, bloqueada y no aplica.
-- Observaciones, enlaces HTTPS de evidencias, registro histórico y responsable de cambio.
-- Control optimista de versiones para impedir sobrescrituras silenciosas desde varias sesiones.
-- API y fuente de datos centralizados en Neon; navegador sin `localStorage` como fuente de verdad.
-- Importación del JSON del tablero anterior y exportación de CSV/JSON.
-- Acceso directo al tablero sin contraseña administrativa ni cookies de sesión. El backend valida el origen de las solicitudes de edición (esto no sustituye un control de acceso).
+## Visión ejecutiva
+- 6 KPI: avance respaldado, completadas con evidencia, en curso, bloqueadas, sin confirmar y fuera de plazo sin cierre documentado.
+- Avance por fase y punto de decisión Go/No-Go. No presupone su aprobación.
+- Actividades filtrables por estado, fase, equipo, criticidad y búsqueda, con detalle, observaciones, responsable y fecha/hora real.
+- Línea de tiempo del 8 al 20/11, exportación CSV de seguimiento.
+- Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback, más observaciones detectadas en el plan.
+- Interfaz responsive. Los estados iniciales son **Sin confirmar**, no «no ejecutada».
 
-## Configurar Vercel
-1. Conectar `Trigoat2612/seguimiento-cronograma` al proyecto existente `seguimiento-cronograma-2qnh` o confirmar que ya está vinculado.
-2. Colocar **estos archivos en la raíz del repositorio** (no dentro de otra carpeta). En Framework Preset usar **Other** y Output Directory sin establecer.
-3. Agregar en Settings > Environment Variables: `DATABASE_URL` (cadena de conexión **pooled** de Neon, solo en el servidor). **No se necesitan** variables de contraseña ni secreto de sesión. No incluir las claves en Git ni variables `VITE_*`.
-4. Desplegar y abrir la URL asignada por Vercel. La aplicación muestra el tablero directamente; cambiar el estado de una actividad y refrescar para comprobar su persistencia en Neon.
+## Persistencia centralizada y seguridad
 
-## Estado de Neon
-En la rama **production** `br-misty-firefly-b52a21f6` del proyecto `super-credit-91949836`, base `neondb`, se creó el esquema aislado `seguimiento_cronograma` y se cargaron las 80 actividades. **No volver a ejecutar la carga inicial manualmente**; el esquema SQL de `db/001_schema.sql` queda para reproducir la estructura en otro entorno si se necesitara. Los datos reales ya están en la base indicada.
+Los archivos del tablero son `index.html`, `data/plan-operaciones.json`, `api/operaciones.js`, `db/002_operaciones_salida.sql` y `lib/core.js` (compartida con el proyecto anterior). El API usa Neon, manteniendo **intactas** las tablas previas `seguimiento_cronograma.activities`, `activity_history` y `activity_evidence`.
 
-## Precauciones
-- **Advertencia:** sin autenticación a nivel de aplicación, cualquier persona que acceda al sitio puede leer y modificar el seguimiento. Para uso interno, activar Deployment Protection o algún control de acceso de Vercel. La validación del encabezado Origin no impide solicitudes directas. La bitácora registra `tablero web`, no la identidad real de cada editor.
-- El historial es de cambios registrados por el tablero, no representa evidencia de ejecución de GTI. Los enlaces a archivos deben dirigir a un repositorio con permisos institucionales.
-- No usar este tablero para cargar expedientes ni documentos judiciales sensibles. Registra **solo seguimiento de actividades**.
-- El cronograma es propuesto; horas y volúmenes deben confirmarse en pruebas.
-- La lógica `api/activities.js` asume el esquema de Neon preparado. No otorga acceso directo a Postgres al navegador.
+Antes de habilitar el seguimiento compartido:
+1. Ejecutar **con autorización** la migración SQL `db/002_operaciones_salida.sql` en `neondb`, proyecto Neon del seguimiento. Crea exclusivamente `operational_status`, `operational_evidence` y `operational_history` dentro del esquema existente.
+2. En Vercel configurar `DATABASE_URL` como variable **solo del servidor**, con la cadena de conexión a Neon. No incluir en el repositorio ni en archivos públicos.
+3. Configurar `OPERACIONES_EDITOR_KEY` (clave aleatoria de 12+ caracteres) como variable de entorno privada. En la web, introducirla mediante el botón «Edición». La clave no se persiste en `localStorage` ni se incluye en el código.
+4. Activar Deployment Protection / autenticación de acceso para restringir también **lectura** del dashboard. La clave de edición no protege las solicitudes GET, ni identifica por sí sola a una persona.
+5. Abrir el dashboard, registrar un cambio y verificar que permanece después de actualizar. Control de versiones optimista para evitar sobreescrituras en sesiones simultáneas.
 
-## Desarrollo local
-`npm install` y exportar las variables de entorno. `npm run dev` en `http://localhost:3000`. Se utiliza el mismo backend para pruebas locales; las solicitudes que modifican datos deben proceder del origen de la aplicación.
+El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en observaciones.
 
-## Variables retiradas
-- `ADMIN_PASSWORD` y `SESSION_SECRET` fueron eliminadas del código, la interfaz y el ejemplo de configuración. Si están registradas como variables antiguas en Vercel, se pueden eliminar de ese proyecto después de confirmar que está desplegada esta versión.
+## Sin conexión a Neon
+
+Si la API no responde, el tablero cambia de forma visible al **modo ensayo local**. Permite probar filtros, seguimiento y evidencia con `localStorage`. Estos datos **no son oficiales ni se comparten** y jamás se escriben automáticamente en Neon. La aplicación muestra claramente la diferencia. No contar un porcentaje de ensayo como cumplimiento real.
+
+## Integridad de la fuente
+
+`data/plan-operaciones.json` conserva los textos originales de fecha, inicio, fin, responsable, evidencia y página PDF. Para fines visuales añade `start_at` / `end_at` cuando hay horarios suficientes. Los rangos multifecha **no implican trabajo continuo**. `GO` y `C4-R` son IDs **técnicos** de filas sin código identificable; el código fuente se mantiene intacto. Las tareas a demanda y de monitoreo continuo no se incluyen en el denominador del porcentaje de cierre.
+
+La «criticidad» es una priorización visual construida para seguimiento, no una categorización aprobada en el PDF. Las 8 observaciones de inconsistencias se muestran separadas, sin alterar el plan.
+
+## Desarrollo
+
+```sh
+npm install
+npm run dev
+# abrir http://localhost:3000
+npm run check
+```
+
+La conexión a Neon y la clave de editor se configuran mediante variables de entorno privadas. En el repositorio principal, `server-local.mjs` debe servir `data/plan-operaciones.json` y enrutar `/api/operaciones` a `api/operaciones.js`.
