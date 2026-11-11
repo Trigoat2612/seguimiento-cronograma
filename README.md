@@ -17,9 +17,8 @@ Los archivos del tablero son `index.html`, `data/plan-operaciones.json`, `api/op
 Antes de habilitar el seguimiento compartido:
 1. Ejecutar **con autorización** la migración SQL `db/002_operaciones_salida.sql` en `neondb`, proyecto Neon del seguimiento. Crea exclusivamente `operational_status`, `operational_evidence` y `operational_history` dentro del esquema existente.
 2. En Vercel configurar `DATABASE_URL` como variable **solo del servidor**, con la cadena de conexión a Neon. No incluir en el repositorio ni en archivos públicos.
-3. Configurar `OPERACIONES_EDITOR_KEY` (clave aleatoria de 12+ caracteres) como variable de entorno privada. En la web, introducirla mediante el botón «Edición». La clave no se persiste en `localStorage` ni se incluye en el código.
-4. Activar Deployment Protection / autenticación de acceso para restringir también **lectura** del dashboard. La clave de edición no protege las solicitudes GET, ni identifica por sí sola a una persona.
-5. Abrir el dashboard, registrar un cambio y verificar que permanece después de actualizar. Control de versiones optimista para evitar sobreescrituras en sesiones simultáneas.
+3. Activar Deployment Protection / autenticación de acceso para restringir tanto **lectura como escritura**. Sin autenticación propia, quien tenga acceso a la web puede modificar el seguimiento. La validación de `Origin` no es autenticación.
+4. Abrir el dashboard, registrar un cambio y verificar que permanece después de actualizar. Control de versiones optimista para evitar sobreescrituras en sesiones simultáneas.
 
 El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en las notas de seguimiento.
 
@@ -42,4 +41,4 @@ npm run dev
 npm run check
 ```
 
-La conexión a Neon y la clave de editor se configuran mediante variables de entorno privadas. En el repositorio principal, `server-local.mjs` debe servir `data/plan-operaciones.json` y enrutar `/api/operaciones` a `api/operaciones.js`.
+Solo `DATABASE_URL` es necesaria para la conexión con Neon. Ya no se usa `OPERACIONES_EDITOR_KEY`; puede eliminarse de Vercel si existiera. `server-local.mjs` sirve `data/plan-operaciones.json` y enruta `/api/operaciones` a `api/operaciones.js`.
