@@ -92,3 +92,15 @@ test('multipart guarda metadatos de carpeta y el archivo sin publicarlo',async()
 test('credenciales incompletas desactivan subida',()=>{
  assert.throws(()=>driveConfig({GOOGLE_OAUTH_CLIENT_ID:'a'}),e=>e.code==='DRIVE_NOT_CONFIGURED');
 });
+
+test('dashboard incluye formulario, evento de carga y JS válido',async()=>{
+ const {readFile} = await import('node:fs/promises');
+ const html = await readFile(new URL('../index.html',import.meta.url),'utf8');
+ assert.match(html,/id="drive-file"/);
+ assert.match(html,/id="drive-code"/);
+ assert.match(html,/id="drive-submit"/);
+ assert.match(html,/async function uploadDriveEvidence/);
+ const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];
+ assert.ok(script,'JS del dashboard no encontrado');
+ assert.doesNotThrow(()=>new Function('async function validateModule(){\n'+script+'\n}'));
+});
