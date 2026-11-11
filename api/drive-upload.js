@@ -2,7 +2,7 @@ import {json, guard, getSql} from '../lib/core.js';
 import {
   ACTIVITY_IDS, MAX_UPLOADS_PER_IP_HOUR, MAX_UPLOADS_GLOBAL_DAY,
   UploadError, header, decodeHeader, safeName,
-  requireUploadCode, clientHash, readLimitedFile, validateFile, uploaderName,
+  clientHash, readLimitedFile, validateFile, uploaderName,
   driveConfig, getAccessToken, saveToDrive, cleanupDrive
 } from '../lib/drive-upload.js';
 
@@ -26,7 +26,6 @@ export default async function handler(req, res) {
 
   let sql, attemptId, driveFile, token;
   try {
-    requireUploadCode(req);
     const google = driveConfig();
     const id = String(req.query?.activityId || '');
     if (!ACTIVITY_IDS.has(id)) throw new UploadError('INVALID_ACTIVITY','Código de actividad no válido.');
@@ -40,7 +39,7 @@ export default async function handler(req, res) {
     sql = getSql();
     const hashedIP = clientHash(req);
 
-    // Cuotas preventivas tras validar el código.
+    // Cuotas preventivas para cargas sin inicio de sesión.
     const admitted = await sql`WITH usage AS (
       SELECT
         count(*) FILTER(WHERE uploader_hash=${hashedIP}

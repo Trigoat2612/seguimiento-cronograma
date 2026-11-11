@@ -138,8 +138,6 @@ const raci=PLAN.raci.filter(r=>String(r.code||'').split('/').includes(a.code));c
   <div class="drive-upload-header"><div><strong>Subir evidencia a Google Drive</strong><small>PDF, PNG o JPG · máximo 3 MiB · asociado a esta actividad</small></div><span class="drive-upload-pill">Drive + Neon</span></div>
   <label for="drive-file">Seleccionar archivo</label>
   <input id="drive-file" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" aria-describedby="upload-info">
-  <label for="drive-code" style="margin-top:10px">Código de carga</label>
-  <input id="drive-code" type="password" autocomplete="off" placeholder="Código facilitado por el coordinador" aria-describedby="upload-info">
   <div class="drive-upload-actions"><button class="btn primary" id="drive-submit" type="button">↑ Subir a Drive</button><span id="upload-info" role="status" aria-live="polite">No requiere iniciar sesión en Google. El código no se guarda en este navegador.</span></div>
   <p class="drive-upload-note">El archivo se guarda en la carpeta institucional; el enlace se registra en esta actividad. Quitar una evidencia del tablero no borra el archivo de Drive.</p>
  </div><div class="formgroup"><label>Descripción de la evidencia</label><input id="evidence-label" maxlength="200" placeholder="Acta firmada, correo, logs…"></div><div class="formgroup"><label>URL HTTPS de evidencia</label><input id="evidence-url" type="url" placeholder="https://drive.google.com/..."></div><div class="formgroup wide"><button class="btn" id="add-evidence" type="button">+ Añadir evidencia</button></div></div><div class="actions"><span class="formhelp" id="save-hint">${demo?'MODO ENSAYO: cambios solo en este navegador':'Los cambios se registran en Neon.'}</span><button class="btn" id="cancel-edit">Cerrar</button><button class="btn primary" id="save-activity">Guardar seguimiento</button></div><div style="margin-top:16px;border-top:1px solid #e6edf3;padding-top:12px"><strong>Últimos cambios</strong><div id="history-list">${detail.history?.length?detail.history.map(h=>`<div class="evidence-row"><span>${esc(h.status)} · ${esc(h.changed_by||'')} <small>(${esc(h.changed_at?fmt(h.changed_at,{year:'numeric',hour:'2-digit',minute:'2-digit'}):'ensayo')})</small></span></div>`).join(''):'<div class="list-empty">Sin cambios históricos</div>'}</div></div>`;openDialog((a.code==='—'?'Go/No-Go':a.code)+' · '+a.activity,a.phase+' · Página '+a.page+' del PDF',content);$('cancel-edit').onclick=closeDialog;$('save-activity').onclick=()=>saveActivity(id);$('add-evidence').onclick=()=>addEvidence(id);$('drive-submit').onclick=()=>uploadDriveEvidence(id);$('dialog-body').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeEvidence(id,b.dataset.remove))}
@@ -147,12 +145,11 @@ function validActual(raw){if(!raw)return null;const x=new Date(raw+'-05:00');if(
 async function saveActivity(id){try{const status=$('activity-status').value,notes=$('activity-notes').value,changedBy=$('activity-editor').value.trim()||'Sin identificar',actualAt=validActual($('activity-actual').value);const old=stateFor(id);if(demo){const hist=old.demo_history||[];records[id]={...old,status,notes,updated_by:changedBy,updated_at:new Date().toISOString(),actual_at:actualAt,version:(old.version||0)+1,demo_history:[{status,changed_by:changedBy,changed_at:new Date().toISOString()},...hist]};localWrite()}else{const res=await api('/api/operaciones',{method:'PATCH',body:JSON.stringify({id,status,notes,changedBy,actualAt,version:old.version||0})});records[id]={...old,...res.activity}}render();closeDialog();updateConnection(demo?'Ensayo guardado únicamente en este navegador. No constituye evidencia oficial.':'Cambio de seguimiento registrado en Neon.','ok')}catch(e){alert('No se pudo guardar: '+e.message)}}
 async function uploadDriveEvidence(id){
  const input=$('drive-file'),file=input?.files?.[0],btn=$('drive-submit'),info=$('upload-info');
- const code=$('drive-code')?.value||'',who=$('activity-editor')?.value.trim()||'';
+ const who=$('activity-editor')?.value.trim()||'';
  if(!connected||demo){info.textContent='La carga requiere conexión a Neon. Estás en modo ensayo local.';return}
  if(!file){info.textContent='Selecciona primero un archivo PDF, PNG o JPG.';return}
  if(file.size>3*1024*1024){info.textContent='El tamaño máximo es 3 MiB.';return}
  if(!['application/pdf','image/png','image/jpeg'].includes(file.type)){info.textContent='Solo se admiten PDF, PNG y JPG.';return}
- if(code.length<16){info.textContent='Introduce el código de carga proporcionado por el coordinador.';return}
  if(!who||who==='Sin identificar'){info.textContent='Identifica quién registra la evidencia.';return}
  btn.disabled=true;btn.textContent='Subiendo…';info.textContent='Enviando archivo a Drive y registrando el vínculo en Neon…';
  try{
@@ -160,8 +157,7 @@ async function uploadDriveEvidence(id){
    method:'POST',cache:'no-store',
    headers:{'Content-Type':file.type,
     'X-File-Name':encodeURIComponent(file.name),
-    'X-Uploaded-By':encodeURIComponent(who),
-    'X-Evidence-Upload-Code':code},
+    'X-Uploaded-By':encodeURIComponent(who)},
    body:file
   });
   const body=await response.json().catch(()=>({}));

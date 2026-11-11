@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {Readable} from 'node:stream';
 import {
   ACTIVITY_IDS, ALLOWED_MIME, MAX_UPLOAD_BYTES, UploadError,
-  safeName, validateFile, requireUploadCode, clientHash,
+  safeName, validateFile, clientHash,
   readLimitedFile, driveConfig, getAccessToken, saveToDrive,
   uploaderName
 } from '../lib/drive-upload.js';
@@ -35,18 +35,17 @@ test('normaliza nombres sin rutas ni separadores extraños',()=>{
  assert.equal(safeName('../../acta 1.pdf'),'acta 1.pdf');
  assert.equal(safeName('C:\\users\\documentos\\ acta.pdf'),' acta.pdf'.trim());
 });
-test('requiere código de carga de mínimo 16 caracteres',()=>{
- const secret='UnaClaveDePruebaSoloLocal';
- const req={headers:{'x-evidence-upload-code':secret}};
- assert.doesNotThrow(()=>requireUploadCode(req,secret));
- assert.throws(()=>requireUploadCode({headers:{'x-evidence-upload-code':'incorrecta'}},secret),e=>e.status===403);
- assert.throws(()=>requireUploadCode(req,'corta'),e=>e.status===503);
-});
 test('hash de cliente no divulga IP en registro',()=>{
  const req={headers:{'x-forwarded-for':'198.51.100.23, 10.0.0.1'}};
- const hash=clientHash(req,'UnaClaveDePruebaSoloLocal');
+ const hash=clientHash(req,'OAuthSecretParaPrueba');
  assert.match(hash,/^[a-f0-9]{64}$/);
  assert.equal(hash.includes('198.51.100.23'),false);
+});
+test('cuota de carga usa el secreto OAuth existente',()=>{
+ const req={headers:{'x-forwarded-for':'192.0.2.23'}};
+ assert.throws(()=>clientHash(req,''),e=>e.code==='DRIVE_NOT_CONFIGURED');
+ assert.equal(clientHash(req,'SecretOauth1'),clientHash(req,'SecretOauth1'));
+ assert.notEqual(clientHash(req,'SecretOauth1'),clientHash(req,'SecretOauth2'));
 });
 test('rechaza un cuerpo binario demasiado grande, sin red',async()=>{
  const req=Readable.from([Buffer.alloc(MAX_UPLOAD_BYTES+1)]);
@@ -97,7 +96,7 @@ test('dashboard incluye formulario, evento de carga y JS válido',async()=>{
  const {readFile} = await import('node:fs/promises');
  const html = await readFile(new URL('../index.html',import.meta.url),'utf8');
  assert.match(html,/id="drive-file"/);
- assert.match(html,/id="drive-code"/);
+ assert.doesNotMatch(html,/id="drive-code"/);
  assert.match(html,/id="drive-submit"/);
  assert.match(html,/async function uploadDriveEvidence/);
  const script=html.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];
