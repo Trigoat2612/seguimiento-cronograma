@@ -5,9 +5,9 @@ Evolución del repositorio `Trigoat2612/seguimiento-cronograma` para el **Plan d
 ## Visión ejecutiva
 - 6 KPI: avance respaldado, completadas con evidencia, en curso, bloqueadas, sin confirmar y fuera de plazo sin cierre documentado.
 - Avance por fase y punto de decisión Go/No-Go. No presupone su aprobación.
-- Actividades filtrables por estado, fase, equipo, criticidad y búsqueda, con detalle, observaciones, responsable y fecha/hora real.
+- Actividades filtrables por estado, fase, equipo, criticidad y búsqueda, con detalle, registro de ejecución, responsable y fecha/hora real.
 - Línea de tiempo del 8 al 20/11, exportación CSV de seguimiento.
-- Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback, más observaciones detectadas en el plan.
+- Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback.
 - Interfaz responsive. Los estados iniciales son **Sin confirmar**, no «no ejecutada».
 
 ## Persistencia centralizada y seguridad
@@ -21,7 +21,7 @@ Antes de habilitar el seguimiento compartido:
 4. Activar Deployment Protection / autenticación de acceso para restringir también **lectura** del dashboard. La clave de edición no protege las solicitudes GET, ni identifica por sí sola a una persona.
 5. Abrir el dashboard, registrar un cambio y verificar que permanece después de actualizar. Control de versiones optimista para evitar sobreescrituras en sesiones simultáneas.
 
-El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en observaciones.
+El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en las notas de seguimiento.
 
 ## Sin conexión a Neon
 
@@ -31,7 +31,7 @@ Si la API no responde, el tablero cambia de forma visible al **modo ensayo local
 
 `data/plan-operaciones.json` conserva los textos originales de fecha, inicio, fin, responsable, evidencia y página PDF. Para fines visuales añade `start_at` / `end_at` cuando hay horarios suficientes. Los rangos multifecha **no implican trabajo continuo**. `GO` y `C4-R` son IDs **técnicos** de filas sin código identificable; el código fuente se mantiene intacto. Las tareas a demanda y de monitoreo continuo no se incluyen en el denominador del porcentaje de cierre.
 
-La «criticidad» es una priorización visual construida para seguimiento, no una categorización aprobada en el PDF. Las 8 observaciones de inconsistencias se muestran separadas, sin alterar el plan.
+La «criticidad» es una priorización visual construida para seguimiento, no una categorización aprobada en el PDF. La información operativa del plan se conserva sin alterar sus actividades ni responsables.
 
 ## Desarrollo
 
