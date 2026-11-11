@@ -1,10 +1,18 @@
 {
-  "name":"seguimiento-cronograma",
-  "version":"1.0.0",
-  "private":true,
-  "type":"module",
-  "description":"Seguimiento de migración de expedientes archivados SIJ a EJE No Penal",
-  "scripts":{"start":"node server-local.mjs","dev":"node server-local.mjs","check":"node --check api/activities.js && node --check api/history.js && node --check api/evidence.js && node --check api/import.js && node --check lib/core.js && node --check server-local.mjs"},
-  "dependencies":{"@neondatabase/serverless":"^1.0.0"},
-  "engines":{"node":">=20"}
+  "name": "seguimiento-cronograma",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Seguimiento de migración de expedientes archivados SIJ a EJE No Penal",
+  "scripts": {
+    "start": "node server-local.mjs",
+    "dev": "node server-local.mjs",
+    "check": "node --check api/operaciones.js && node --check api/activities.js && node --check api/history.js && node --check api/evidence.js && node --check api/import.js && node --check lib/core.js && node --check server-local.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }
