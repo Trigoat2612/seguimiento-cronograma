@@ -104,3 +104,15 @@ test('dashboard incluye formulario, evento de carga y JS válido',async()=>{
  assert.ok(script,'JS del dashboard no encontrado');
  assert.doesNotThrow(()=>new Function('async function validateModule(){\n'+script+'\n}'));
 });
+
+test('favicon personalizado PNG en la página y ruta local',async()=>{
+ const {readFile} = await import('node:fs/promises');
+ const index = await readFile(new URL('../index.html',import.meta.url),'utf8');
+ const icon = await readFile(new URL('../favicon.png',import.meta.url));
+ const server = await readFile(new URL('../server-local.mjs',import.meta.url),'utf8');
+ assert.match(index, /<link rel="icon" href="\/favicon\.png" type="image\/png" sizes="64x64">/);
+ assert.ok(icon.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])));
+ assert.equal(icon.readUInt32BE(16),64);
+ assert.equal(icon.readUInt32BE(20),64);
+ assert.match(server,/url\.pathname==='\/favicon\.png'/);
+});
