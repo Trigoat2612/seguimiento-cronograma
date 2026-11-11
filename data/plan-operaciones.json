@@ -1034,55 +1034,5 @@
       "role": "Especialista de Seguridad – PEJENP",
       "organization": "PJ"
     }
-  ],
-  "quality_issues": [
-    {
-      "severity": "Crítica",
-      "title": "Responsable del rollback sin criterio único",
-      "detail": "6.1 U4 y procedimiento 6.4 asignan la restauración a SP-08, mientras 6.3 nivel 4 indica SP-07.",
-      "source": "págs. 13–14"
-    },
-    {
-      "severity": "Alta",
-      "title": "Hora límite de respaldo contradictoria",
-      "detail": "6.1 U3 establece No-Go hasta las 10:00 del 11/11, pero cronograma A6 prevé respaldo de 11:30 a 15:00.",
-      "source": "págs. 11 y 13"
-    },
-    {
-      "severity": "Alta",
-      "title": "Responsable PJ-13 sin directorio",
-      "detail": "La actividad D2 menciona PJ-13, pero este código no figura en la sección 4.1.",
-      "source": "págs. 8 y 12"
-    },
-    {
-      "severity": "Media",
-      "title": "Actividad A3 sin fechas",
-      "detail": "El cronograma no consigna fecha ni horas de inicio y fin de la actividad A3.",
-      "source": "pág. 11"
-    },
-    {
-      "severity": "Media",
-      "title": "Actividad A2 sin hora de inicio",
-      "detail": "El cronograma indica fin 11:30, pero no hora de inicio para conceder permisos.",
-      "source": "pág. 11"
-    },
-    {
-      "severity": "Media",
-      "title": "Fila de reintentos sin código independiente",
-      "detail": "El análisis/mitigación (C4) y los reintentos están en dos filas; la segunda no tiene código consignado.",
-      "source": "pág. 12"
-    },
-    {
-      "severity": "Media",
-      "title": "Diferencia en fechas de validación de usuarios",
-      "detail": "Los datos generales indican 16–18/11, mientras C5.2 en el cronograma establece 17–20/11.",
-      "source": "págs. 4 y 12"
-    },
-    {
-      "severity": "Media",
-      "title": "Plazo general de cabecera distinto del detalle",
-      "detail": "El objetivo menciona ventana 11/11 18:00 a 12/11 07:00, mientras el cronograma incluye carga hasta 12/11 18:00 y validación hasta 22:00.",
-      "source": "págs. 4, 11 y 12"
-    }
   ]
 }
