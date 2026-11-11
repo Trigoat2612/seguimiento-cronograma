@@ -6,6 +6,7 @@ Evolución del repositorio `Trigoat2612/seguimiento-cronograma` para el **Plan d
 - 6 KPI: avance respaldado, completadas con evidencia, en curso, bloqueadas, sin confirmar y fuera de plazo sin cierre documentado.
 - Avance por fase y punto de decisión Go/No-Go. No presupone su aprobación.
 - Actividades filtrables por estado, fase, equipo, criticidad y búsqueda, con detalle, registro de ejecución, responsable y fecha/hora real.
+- Columna de responsables clicable: fichas por actividad y directorio general con búsqueda por código, nombre, cargo u organización. Identifica personas «por designar» y códigos no incluidos en el directorio.
 - Línea de tiempo del 8 al 20/11, exportación CSV de seguimiento.
 - Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback.
 - Interfaz responsive. Los estados iniciales son **Sin confirmar**, no «no ejecutada».
@@ -19,6 +20,8 @@ Antes de habilitar el seguimiento compartido:
 2. En Vercel configurar `DATABASE_URL` como variable **solo del servidor**, con la cadena de conexión a Neon. No incluir en el repositorio ni en archivos públicos.
 3. Activar Deployment Protection / autenticación de acceso para restringir tanto **lectura como escritura**. Sin autenticación propia, quien tenga acceso a la web puede modificar el seguimiento. La validación de `Origin` no es autenticación.
 4. Abrir el dashboard, registrar un cambio y verificar que permanece después de actualizar. Control de versiones optimista para evitar sobreescrituras en sesiones simultáneas.
+
+El dataset público incorpora nombres y suplentes del directorio de responsables, pero **no publica correos ni teléfonos**. Si la identidad del personal debe mantenerse reservada, se debe restringir también el acceso al repositorio o retirar los nombres antes de difundirlo.
 
 El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en las notas de seguimiento.
 
