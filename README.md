@@ -10,6 +10,7 @@ Evolución del repositorio `Trigoat2612/seguimiento-cronograma` para el **Plan d
 - Línea de tiempo del 8 al 20/11, exportación CSV de seguimiento.
 - Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback.
 - Interfaz responsive. Los estados iniciales son **Sin confirmar**, no «no ejecutada».
+- **Nueva característica experimental (solo rama alternativa):** carga de PDF/PNG/JPG a Google Drive, sin inicio de sesión Google por visitante, mediante credenciales OAuth del servidor. Documentación: [Evidencias Google Drive](docs/EVIDENCIAS_GOOGLE_DRIVE.md).
 
 ## Persistencia centralizada y seguridad
 
@@ -23,7 +24,7 @@ Antes de habilitar el seguimiento compartido:
 
 El dataset público incorpora nombres y suplentes del directorio de responsables, pero **no publica correos ni teléfonos**. Si la identidad del personal debe mantenerse reservada, se debe restringir también el acceso al repositorio o retirar los nombres antes de difundirlo.
 
-El sistema solo registra **enlaces HTTPS** a evidencias guardadas en repositorios institucionales con permisos propios. No sube ni almacena expedientes judiciales. No se debe ingresar información sensible en las notas de seguimiento.
+El sistema permite conservar evidencias por enlace HTTPS. En la rama experimental, además, ofrece **Subir a Drive**, que registra automáticamente el archivo y su vínculo en Neon después de cargarlo. Solo admite PDF, PNG y JPG pequeños. No subir expedientes judiciales ni información sensible.
 
 ## Sin conexión a Neon
 
@@ -45,3 +46,9 @@ npm run check
 ```
 
 Solo `DATABASE_URL` es necesaria para la conexión con Neon. Ya no se usa `OPERACIONES_EDITOR_KEY`; puede eliminarse de Vercel si existiera. `server-local.mjs` sirve `data/plan-operaciones.json` y enruta `/api/operaciones` a `api/operaciones.js`.
+
+## Carga Drive (rama experimental)
+
+La característica de carga requiere configurar `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID` y tener aplicada la migración `db/003_drive_evidence.sql` en Neon. La migración ya se aplicó y verificó en `neondb` el 11/11/2026. **La lectura del dashboard no depende de estas variables**. El visitante no requiere cuenta de Google ni código adicional. Cualquiera que pueda acceder al dashboard podrá intentar subir archivos, con cuotas preventivas de tamaño, formato y frecuencia.
+
+Consulta [la guía de implementación y seguridad](docs/EVIDENCIAS_GOOGLE_DRIVE.md) antes de desplegar. Ejecuta `npm run check` y `npm test`.

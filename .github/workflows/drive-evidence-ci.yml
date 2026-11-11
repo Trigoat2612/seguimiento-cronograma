@@ -1,0 +1,25 @@
+name: Verificar carga de evidencias a Drive
+on:
+  pull_request:
+    paths:
+      - 'api/drive-upload.js'
+      - 'lib/drive-upload.js'
+      - 'tests/drive-upload.test.js'
+      - 'package.json'
+      - '.github/workflows/drive-evidence-ci.yml'
+  push:
+    branches:
+      - 'feat/evidencias-drive-sin-login-2026-11-11'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
