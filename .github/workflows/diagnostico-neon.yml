@@ -1,0 +1,26 @@
+name: Diagnostico Neon HTTP sin credenciales
+on:
+  push:
+    branches:
+      - diagnostico/neon-produccion-2026-11-11
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Consultas GET seguras a APIs publicas
+        shell: bash
+        run: |
+          for url in \
+            "https://seguimiento-cronograma-2qnh.vercel.app/api/operaciones" \
+            "https://seguimiento-cronograma.vercel.app/api/operaciones" \
+            "https://seguimiento-cronograma-2qnh-git-da566d-miguel-trigosos-projects.vercel.app/api/operaciones"; do
+            echo "=== URL: $url"
+            printf "HTTP "
+            curl --max-time 14 --connect-timeout 7 --silent --show-error --location --output /tmp/neon-body --write-out "%{http_code}\n" "$url" || true
+            echo "Content preview, max 600 bytes:"
+            head -c 600 /tmp/neon-body 2>/dev/null || true
+            echo
+          done
