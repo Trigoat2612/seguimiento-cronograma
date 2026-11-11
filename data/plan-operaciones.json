@@ -902,137 +902,191 @@
     {
       "code": "SP-01",
       "role": "Gerente de Datos",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Priscila Rodrigues Vieira",
+      "backup": "SP-03"
     },
     {
       "code": "SP-02",
       "role": "Líder de Migración (responsable técnico de la herramienta)",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Rafael Alecsander Ferreira",
+      "backup": "SP-04 / SP-05"
     },
     {
       "code": "SP-03",
       "role": "Group Product Manager (negocio y reglas de migración)",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Kazumi Futatsugi",
+      "backup": "SP-01"
     },
     {
       "code": "SP-04",
       "role": "Ingeniero de datos (ejecución de rutinas y reprocesamiento)",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Eder Dozól Barabas",
+      "backup": "SP-02"
     },
     {
       "code": "SP-05",
       "role": "Ingeniero de datos (ejecución de rutinas y reprocesamiento)",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Anabel Silva Bethencourt",
+      "backup": "SP-02"
     },
     {
       "code": "SP-06",
       "role": "Especialista en infraestructura y base de datos",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Aldori Pedro dos Santos Junior",
+      "backup": "SP-07"
     },
     {
       "code": "SP-07",
       "role": "Especialista en aplicaciones e infraestructura (no estructurados)",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Nadir Bernardo Bianchini",
+      "backup": "SP-06"
     },
     {
       "code": "SP-08",
       "role": "Administrador de Base de Datos del destino",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Reginaldo de Faveri",
+      "backup": "SP-09"
     },
     {
       "code": "SP-09",
       "role": "Administrador de Base de Datos del destino",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Daniela Borba Vilela Borges",
+      "backup": "SP-08"
     },
     {
       "code": "SP-10",
       "role": "Administrador del sistema EJE",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Wanderson José Lino Alves Brasil",
+      "backup": "SP-11"
     },
     {
       "code": "SP-11",
       "role": "Administrador del sistema EJE",
-      "organization": "SOFTPLAN"
+      "organization": "SOFTPLAN",
+      "name": "Renan Ferreira Silva",
+      "backup": "SP-10"
     },
     {
       "code": "PJ-01",
       "role": "Gerente de Proyecto PEJENP (coordina validación).",
-      "organization": "PEJENP"
+      "organization": "PEJENP",
+      "name": "Liz Maribel Yupanqui Leonardo",
+      "backup": "PJ-02"
     },
     {
       "code": "PJ-02",
       "role": "Dirección Ejecutiva del PEJENP (último nivel de escalamiento)",
-      "organization": "PEJENP"
+      "organization": "PEJENP",
+      "name": "Carlos César Meza Montalvo",
+      "backup": "PJ-15"
     },
     {
       "code": "PJ-03",
       "role": "Equipo de calidad / negocio EJENP (validación funcional)",
-      "organization": "PEJENP"
+      "organization": "PEJENP",
+      "name": "Jhonathan Vasquez Tomas del Aguila Peña",
+      "backup": "PJ-16"
     },
     {
       "code": "PJ-04",
       "role": "Coordinador técnico de la GTI (permisos, accesos, acompañamiento)",
-      "organization": "GTI"
+      "organization": "GTI",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-05",
       "role": "DBA de la GTI – SATI BD de origen SIJ (acompañamiento)",
-      "organization": "GTI SATI"
+      "organization": "GTI SATI",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-06",
       "role": "Técnico de infraestructura del PJ (guardia en ventana)",
-      "organization": "GTI"
+      "organization": "GTI",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-07",
       "role": "Coordinador de la CSJ Lima Este (subsanación, aprobación)",
-      "organization": "CSJLE"
+      "organization": "CSJLE",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-08",
       "role": "Técnico de infraestructura y BD de la CSJLE (guardia en ventana)",
-      "organization": "CSJLE"
+      "organization": "CSJLE",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-09",
       "role": "Responsables designados por la Corte (documentos no localizados – R113)",
-      "organization": "CSJLE"
+      "organization": "CSJLE",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-11",
       "role": "Usuarios validadores de los juzgados",
-      "organization": "CSJLE"
+      "organization": "CSJLE",
+      "name": "por designar",
+      "backup": "por designar"
     },
     {
       "code": "PJ-12",
       "role": "Oficial de Seguridad y Confianza Digital / CSIRT-PJ",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Alejandro Arbildo Grandez",
+      "backup": "—"
     },
     {
       "code": "PJ-14",
       "role": "Oficial de Datos Personales del PJ (notificación ANPD)",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Carlos Luis Paccini Torres",
+      "backup": "---"
     },
     {
       "code": "PJ-15",
       "role": "Supervisor de Desarrollo – PEJENP (participa en la formalización de contingencias)",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Andrés Comina",
+      "backup": "PJ-02"
     },
     {
       "code": "PJ-16",
       "role": "Supervisor de Calidad – PEJENP",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Kyrie Rubina Ruso",
+      "backup": "PJ-15"
     },
     {
       "code": "PJ-17",
       "role": "Supervisor de Soporte y Operaciones – PEJENP (participa en la formalización de contingencias)",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Andrés Comina",
+      "backup": "PJ-16"
     },
     {
       "code": "PJ-18",
       "role": "Especialista de Seguridad – PEJENP",
-      "organization": "PJ"
+      "organization": "PJ",
+      "name": "Miguel Chávez",
+      "backup": "PJ-15"
     }
   ]
 }
