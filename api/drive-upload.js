@@ -15,9 +15,9 @@ const respond = (res, error) => {
 };
 async function markAttempt(sql, id, state, driveId = null) {
   try {
-    await sql\`UPDATE seguimiento_cronograma.operational_upload_attempts
-      SET state=\${state}, drive_file_id=\${driveId}, finished_at=now()
-      WHERE upload_id=\${id}\`;
+    await sql`UPDATE seguimiento_cronograma.operational_upload_attempts
+      SET state=${state}, drive_file_id=${driveId}, finished_at=now()
+      WHERE upload_id=${id}`;
   } catch (e) { console.error('[drive-upload-state]',e?.code||'',e?.message||''); }
 }
 export default async function handler(req, res) {
@@ -41,9 +41,9 @@ export default async function handler(req, res) {
     const hashedIP = clientHash(req);
 
     // Cuotas preventivas tras validar el código.
-    const admitted = await sql\`WITH usage AS (
+    const admitted = await sql`WITH usage AS (
       SELECT
-        count(*) FILTER(WHERE uploader_hash=\${hashedIP}
+        count(*) FILTER(WHERE uploader_hash=${hashedIP}
           AND created_at>now()-interval '1 hour')::int AS per_ip,
         count(*) FILTER(WHERE created_at>now()-interval '1 day')::int AS daily
       FROM seguimiento_cronograma.operational_upload_attempts
@@ -51,12 +51,12 @@ export default async function handler(req, res) {
     ), reserved AS (
       INSERT INTO seguimiento_cronograma.operational_upload_attempts
         (activity_id, uploader_hash, uploader, filename, mime_type, size_bytes, state)
-      SELECT \${id},\${hashedIP},\${uploader},\${safeName(cleanName)},
-             \${mime},\${buffer.length},'started'
-      FROM usage WHERE usage.per_ip<\${MAX_UPLOADS_PER_IP_HOUR}
-        AND usage.daily<\${MAX_UPLOADS_GLOBAL_DAY}
+      SELECT ${id},${hashedIP},${uploader},${safeName(cleanName)},
+             ${mime},${buffer.length},'started'
+      FROM usage WHERE usage.per_ip<${MAX_UPLOADS_PER_IP_HOUR}
+        AND usage.daily<${MAX_UPLOADS_GLOBAL_DAY}
       RETURNING upload_id
-    ) SELECT upload_id FROM reserved\`;
+    ) SELECT upload_id FROM reserved`;
     if (!admitted.length) throw new UploadError('UPLOAD_QUOTA','Límite de cargas alcanzado. Intenta más tarde.',429);
     attemptId = admitted[0].upload_id;
 
@@ -66,22 +66,22 @@ export default async function handler(req, res) {
       uploader,folderId:google.GOOGLE_DRIVE_FOLDER_ID,token
     });
     try {
-      await sql\`INSERT INTO seguimiento_cronograma.operational_status(id)
-        VALUES(\${id}) ON CONFLICT DO NOTHING\`;
+      await sql`INSERT INTO seguimiento_cronograma.operational_status(id)
+        VALUES(${id}) ON CONFLICT DO NOTHING`;
       const label = cleanName;
-      const results = await sql\`WITH saved AS (
+      const results = await sql`WITH saved AS (
         INSERT INTO seguimiento_cronograma.operational_evidence
           (activity_id,label,url,created_by,drive_file_id)
-        VALUES (\${id},\${label},\${driveFile.url},\${uploader},\${driveFile.id})
+        VALUES (${id},${label},${driveFile.url},${uploader},${driveFile.id})
         RETURNING evidence_id,activity_id,label,url,created_by,created_at,drive_file_id
       ), history AS (
         INSERT INTO seguimiento_cronograma.operational_history
           (activity_id,status,notes,changed_by,action)
-        SELECT saved.activity_id, s.status, saved.label, \${uploader}, 'archivo_drive'
+        SELECT saved.activity_id, s.status, saved.label, ${uploader}, 'archivo_drive'
         FROM saved JOIN seguimiento_cronograma.operational_status s
           ON saved.activity_id=s.id
         RETURNING event_id
-      ) SELECT * FROM saved\`;
+      ) SELECT * FROM saved`;
       if (!results.length) throw Error('Evidencia no insertada');
       await markAttempt(sql,attemptId,'stored',driveFile.id);
       return json(res,201,{evidence:results[0],stored_in:'google_drive'});
