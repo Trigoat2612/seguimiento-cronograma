@@ -10,7 +10,7 @@ Evolución del repositorio `Trigoat2612/seguimiento-cronograma` para el **Plan d
 - Línea de tiempo del 8 al 20/11, exportación CSV de seguimiento.
 - Consulta de 5 umbrales, 4 niveles y 12 pasos de rollback.
 - Interfaz responsive. Los estados iniciales son **Sin confirmar**, no «no ejecutada».
-- **Nueva característica experimental (solo rama alternativa):** carga de PDF/PNG/JPG a Google Drive, sin inicio de sesión Google por visitante, mediante código de carga y credenciales OAuth de servidor. Documentación: [Evidencias Google Drive](docs/EVIDENCIAS_GOOGLE_DRIVE.md).
+- **Nueva característica experimental (solo rama alternativa):** carga de PDF/PNG/JPG a Google Drive, sin inicio de sesión Google por visitante, mediante credenciales OAuth del servidor. Documentación: [Evidencias Google Drive](docs/EVIDENCIAS_GOOGLE_DRIVE.md).
 
 ## Persistencia centralizada y seguridad
 
@@ -49,6 +49,6 @@ Solo `DATABASE_URL` es necesaria para la conexión con Neon. Ya no se usa `OPERA
 
 ## Carga Drive (rama experimental)
 
-La característica de carga requiere configurar `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID`, `EVIDENCE_UPLOAD_CODE` y aplicar `db/003_drive_evidence.sql` en el ambiente de prueba. **La lectura del dashboard no depende de estas variables**. El visitante no requiere cuenta de Google; el código de carga restringe quién puede subir archivos.
+La característica de carga requiere configurar `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID` y tener aplicada la migración `db/003_drive_evidence.sql` en Neon. La migración ya se aplicó y verificó en `neondb` el 11/11/2026. **La lectura del dashboard no depende de estas variables**. El visitante no requiere cuenta de Google ni código adicional. Cualquiera que pueda acceder al dashboard podrá intentar subir archivos, con cuotas preventivas de tamaño, formato y frecuencia.
 
 Consulta [la guía de implementación y seguridad](docs/EVIDENCIAS_GOOGLE_DRIVE.md) antes de desplegar. Ejecuta `npm run check` y `npm test`.

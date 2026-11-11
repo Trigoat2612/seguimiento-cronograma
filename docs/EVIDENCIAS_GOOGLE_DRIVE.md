@@ -7,7 +7,7 @@ La carga a Google no se puede verificar hasta configurar credenciales reales en 
 
 ## Experiencia de usuario
 1. Abrir una actividad y seleccionar un archivo PDF, PNG o JPG (máximo **3 MiB**).
-2. Completar **Quién registra el cambio** y escribir el **código de carga** entregado por el coordinador.
+2. Completar **Quién registra el cambio**. No se solicita iniciar sesión ni introducir código adicional.
 3. Presionar **Subir a Drive**. No se solicita inicio de sesión en Google.
 4. La función Vercel utiliza credenciales almacenadas exclusivamente en el servidor para subir a la carpeta configurada.
 5. Tras confirmación de Google, Neon vincula la evidencia con la actividad y conserva la fecha y el autor declarado.
@@ -20,7 +20,7 @@ Eliminar una evidencia del dashboard **elimina su asociación en Neon, pero no b
 - Carpeta: https://drive.google.com/drive/folders/1yhEGQA2a3V4liYlqQYiGbvCrqFML5CAq
 - ID: `1yhEGQA2a3V4liYlqQYiGbvCrqFML5CAq`
 - Es una carpeta de **Mi unidad**, no se identificó un Drive compartido.
-- En la revisión, la carpeta tenía un permiso de **cualquier persona con el enlace: editor**. Antes de activar las cargas, **retirar ese permiso** y dejar únicamente editores institucionales necesarios. La aplicación no altera permisos automáticamente.
+- La carpeta tiene el permiso **cualquier persona con el enlace: editor**. No es necesario modificarlo para la integración y no será alterado. Se mantiene por decisión operativa; cualquier persona con el enlace podría modificar archivos directamente.
 - La cuenta Google usada por el servidor debe tener permiso Editor sobre esta carpeta y espacio de almacenamiento.
 
 ## Preparación de OAuth (una sola vez por el administrador)
@@ -37,30 +37,29 @@ Eliminar una evidencia del dashboard **elimina su asociación en Neon, pero no b
    - `GOOGLE_OAUTH_CLIENT_SECRET`
    - `GOOGLE_OAUTH_REFRESH_TOKEN`
    - `GOOGLE_DRIVE_FOLDER_ID=1yhEGQA2a3V4liYlqQYiGbvCrqFML5CAq`
-   - `EVIDENCE_UPLOAD_CODE`: generar aleatoriamente al menos 16 caracteres, compartirla **solo** con quienes suben evidencias.
 6. Marcar secretos como **Sensitive/Encrypted**. No usar valores reales en `.env.example`.
 7. Volver a desplegar la rama Preview para recoger las variables.
 
-**No se reutiliza `OPERACIONES_EDITOR_KEY`.** El nuevo código sirve **solo para subir archivos** y evita que un visitante anónimo pueda saturar el almacenamiento. No es un inicio de sesión Google ni una identificación confiable del autor. Para consulta y registro de estados, la aplicación mantiene su comportamiento previo.
+La carga funciona sin códigos de usuario ni autenticación individual en Google. **Cualquier visitante que pueda abrir el dashboard podrá enviar archivos**, dentro de límites preventivos de cantidad y tamaño. El nombre del usuario será declarado y no verificado. Los permisos de consulta y edición de estados no cambian.
 
 ## Persistencia Neon
 
-Antes de probar una subida, ejecutar y verificar `db/003_drive_evidence.sql` en una rama de Neon de ensayo, no directamente en producción. El script:
+**Aplicado el 11/11/2026**: la migración `db/003_drive_evidence.sql` se ejecutó y verificó en la base `neondb` del proyecto de seguimiento. El script:
 
 - Agrega la columna opcional `drive_file_id` a `operational_evidence`.
 - Crea un índice único parcial para archivos subidos a Drive.
 - Crea `operational_upload_attempts` para cuotas, trazabilidad técnica y detección de cargas huérfanas.
 - **No borra ni modifica** las actividades ni las evidencias existentes por URL.
 
-Luego de validar en Neon de ensayo, aplicar la migración al ambiente conectado a Preview con autorización explícita.
+Para pruebas Preview se puede utilizar la base `neondb` ya migrada, pero las pruebas reales crearán archivos y registros; utiliza una base/ramal de ensayo si necesitas mantener aislados los datos oficiales.
 
 ## Controles incluidos
 
 - Máximo **3 MiB** por archivo (debajo del límite de 4,5 MB de Vercel Functions).
 - Formatos: `application/pdf`, `image/png`, `image/jpeg`; validación de extensión y cabecera binaria.
-- Máximo **10 cargas por IP/hora** y **120 cargas globales/día** mediante registros en Neon. Son límites preventivos, no equivalen a un firewall o protección anti-bots; en condiciones de alta concurrencia pueden excederse ligeramente.
+- Máximo **10 cargas por IP/hora** y **120 cargas globales/día** mediante registros en Neon. El hash de IP utiliza el secreto OAuth que ya se configura para la integración, sin una variable adicional. Son límites preventivos, no equivalen a un firewall, protección anti-bots o autenticación; podrían excederse en condiciones de concurrencia.
 - Validación del identificador contra las 23 actividades oficiales.
-- Clave de subida comparada por tiempo constante, nunca publicada en código ni guardada en `localStorage`.
+- Sin clave de carga: se conservan la comprobación de tipo, extensión, firma, tamaño, ID de actividad y límites de frecuencia. Esto no impide completamente el abuso de un sitio público.
 - Verificación de origen para solicitudes de escritura (no sustituye autenticación).
 - Registro en Neon solo después de respuesta exitosa de Drive; intento de borrar el archivo remoto si falla el registro en Neon.
 - No se crean permisos `anyone` ni se publican automáticamente los archivos; un usuario que abra el enlace podría necesitar permisos de Google para verlos.
@@ -76,7 +75,7 @@ npm test
 
 Prueba funcional en **Preview**:
 1. Sin variables OAuth o código, el botón muestra un error controlado y no crea archivos.
-2. Código inválido: HTTP 403, sin subir a Drive.
+2. Credenciales OAuth inexistentes: HTTP 503, sin subir a Drive.
 3. Archivo > 3 MiB: HTTP 413.
 4. Archivo de extensión o firma incorrecta: HTTP 415/400.
 5. PDF pequeño válido: Google Drive crea el archivo en la carpeta y Neon devuelve evidencia con `drive_file_id`.
@@ -89,4 +88,4 @@ Prueba funcional en **Preview**:
 - No se soportan archivos mayores de 3 MiB ni DOCX/XLSX por el momento.
 - Para archivos grandes se requiere un flujo reanudable/directo diferente; no aumentar el límite sin rediseñar la carga.
 - La aplicación no verifica antivirus. No es apropiada para cargar expedientes judiciales ni información clasificada.
-- La API actual de actividades conserva operaciones de edición sin autenticar. La protección del código nuevo **no protege otras operaciones del dashboard**.
+- El dashboard mantiene operaciones de edición sin autenticar, y la carga de archivos también es abierta a los visitantes, según lo solicitado. La exposición pública requiere asumir ese riesgo.
