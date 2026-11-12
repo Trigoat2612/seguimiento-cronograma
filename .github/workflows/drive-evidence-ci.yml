@@ -5,11 +5,14 @@ on:
       - 'api/drive-upload.js'
       - 'lib/drive-upload.js'
       - 'tests/drive-upload.test.js'
+      - 'tests/tracking-before-evidence.test.js'
+      - 'index.html'
       - 'package.json'
       - '.github/workflows/drive-evidence-ci.yml'
   push:
     branches:
       - 'feat/evidencias-drive-sin-login-2026-11-11'
+      - 'fix/guardar-seguimiento-antes-evidencia-2026-11-11'
 permissions:
   contents: read
 jobs:
