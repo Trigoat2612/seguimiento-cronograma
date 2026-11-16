@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'api/drive-upload.js'
+      - 'api/auth.js'
+      - 'lib/editor-auth.js'
+      - 'tests/editor-auth.test.js'
       - 'lib/drive-upload.js'
       - 'tests/drive-upload.test.js'
       - 'tests/tracking-before-evidence.test.js'
@@ -11,6 +14,7 @@ on:
       - '.github/workflows/drive-evidence-ci.yml'
   push:
     branches:
+      - main
       - 'feat/evidencias-drive-sin-login-2026-11-11'
       - 'fix/guardar-seguimiento-antes-evidencia-2026-11-11'
 permissions:
