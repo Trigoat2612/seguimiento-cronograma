@@ -1,3 +1,4 @@
+import {requireEditor} from '../lib/editor-auth.js';
 import {json, guard, getSql} from '../lib/core.js';
 import {
   ACTIVITY_IDS, MAX_UPLOADS_PER_IP_HOUR, MAX_UPLOADS_GLOBAL_DAY,
@@ -22,7 +23,8 @@ async function markAttempt(sql, id, state, driveId = null) {
 }
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res,405,{error:'Método no permitido.'});
-  if (!guard(req,res,true)) return;
+  const editor=await requireEditor(req,res);
+  if(!editor)return;
 
   let sql, attemptId, driveFile, token;
   try {
@@ -30,16 +32,13 @@ export default async function handler(req, res) {
     const id = String(req.query?.activityId || '');
     if (!ACTIVITY_IDS.has(id)) throw new UploadError('INVALID_ACTIVITY','Código de actividad no válido.');
     const filename = decodeHeader(header(req,'x-file-name'), 'nombre del archivo');
-    const uploader = uploaderName(decodeHeader(header(req,'x-uploaded-by'),'responsable'));
-    if (uploader === 'Sin identificar') {
-      throw new UploadError('MISSING_UPLOADER','Indica quién está registrando la evidencia.');
-    }
+    const uploader=editor.email;
     const buffer = await readLimitedFile(req);
     const {mime, filename:cleanName} = validateFile(buffer,header(req,'content-type'),filename);
     sql = getSql();
     const hashedIP = clientHash(req);
 
-    // Cuotas preventivas para cargas sin inicio de sesión.
+    // Cuotas complementarias para editores autenticados.
     const admitted = await sql`WITH usage AS (
       SELECT
         count(*) FILTER(WHERE uploader_hash=${hashedIP}
