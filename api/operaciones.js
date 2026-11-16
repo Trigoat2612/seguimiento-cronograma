@@ -1,3 +1,4 @@
+import {requireEditor} from '../lib/editor-auth.js';
 import { getSql, json, guard, readBody, failure } from '../lib/core.js';
 
 const statuses = new Set(['Sin confirmar', 'En curso', 'Completada', 'Bloqueada', 'No aplica']);
@@ -5,7 +6,8 @@ const isId = value => typeof value === 'string' && /^[a-z0-9-]{2,18}$/.test(valu
 const editorName = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 100 ? value.trim() : 'Sin identificar';
 export default async function handler(req, res) {
   if (!['GET','PATCH','POST','DELETE'].includes(req.method)) return json(res,405,{error:'Método no permitido.'});
-  if (req.method!=='GET'&&!guard(req,res,true)) return;
+  const editor=req.method==='GET'?null:await requireEditor(req,res);
+  if(req.method!=='GET'&&!editor)return;
   try {
     const sql=getSql();
     if (req.method==='GET') {
@@ -28,7 +30,7 @@ export default async function handler(req, res) {
     const body=await readBody(req,20000);
     const id=body.id;
     if (!isId(id))return json(res,400,{error:'Código de actividad inválido.'});
-    const changedBy=editorName(body.changedBy);
+    const changedBy=editor.email;
     if (req.method==='PATCH') {
       const {status,notes,actualAt,version}=body;
       if (!statuses.has(status)||typeof notes!=='string'||notes.length>10000||!Number.isSafeInteger(version)||version<0)return json(res,400,{error:'Estado, nota o versión inválidos.'});
