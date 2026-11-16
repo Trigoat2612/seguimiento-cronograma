@@ -54,11 +54,36 @@
 .auth-area{display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:390px}
 #auth-status{max-width:220px;white-space:normal;line-height:1.35}
 #google-login[hidden],#auth-signout[hidden]{display:none!important}
+
+.mig-head{display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap}
+.mig-big{font-size:40px;font-weight:850;letter-spacing:-1.5px;margin:8px 0}
+.mig-stats{display:grid;grid-template-columns:repeat(2,minmax(155px,1fr));gap:12px;flex:1;max-width:620px}
+.mig-stats>div{background:#f5f8fb;border-radius:10px;padding:13px;display:grid;gap:4px}
+.mig-stats strong{font-size:25px}.mig-stats small{font-size:11px;color:var(--muted)}
+.mig-progress-track{height:17px;background:#e9f0f5;border-radius:12px;overflow:hidden;margin:18px 0 10px}
+.mig-progress-track>div{height:100%;background:#16a39b;transition:width .2s}
+.mig-source{font-size:12px;color:var(--muted);margin:8px 0}
+.mig-history{margin-top:18px;border-top:1px solid var(--line);padding-top:15px}
+.mig-history h3{font-size:13px}.mig-history .evidence-row{font-size:12px}
+@media(max-width:750px){.mig-stats{width:100%;max-width:none;grid-template-columns:repeat(2,minmax(0,1fr))}.mig-stats strong{font-size:20px}}
 </style></head><body>
-<div class="app"><aside class="side"><div class="brand"><div class="mark"><img src="/favicon.png" width="38" height="38" alt="" decoding="async"></div><div><strong>EJE No Penal</strong><small>Control de migración</small></div></div><div><div class="side-label">Panel de operaciones</div><nav class="nav" aria-label="Navegación"><a href="#resumen" class="active">◫ &nbsp; Resumen ejecutivo</a><a href="#seguimiento">▤ &nbsp; Seguimiento</a><a href="#ruta">▥ &nbsp; Ruta temporal</a><a href="#contingencia">♧ &nbsp; Contingencia</a></nav></div><div class="sidebottom"><b>Documento base</b><br>Plan de Operaciones de Salida v4.0<br>CSJ Lima Este · NLPT<br>15 de noviembre de 2026</div></aside>
+<div class="app"><aside class="side"><div class="brand"><div class="mark"><img src="/favicon.png" width="38" height="38" alt="" decoding="async"></div><div><strong>EJE No Penal</strong><small>Control de migración</small></div></div><div><div class="side-label">Panel de operaciones</div><nav class="nav" aria-label="Navegación"><a href="#resumen" class="active">◫ &nbsp; Resumen ejecutivo</a><a href="#migracion">◉ &nbsp; Avance de expedientes</a><a href="#seguimiento">▤ &nbsp; Seguimiento</a><a href="#ruta">▥ &nbsp; Ruta temporal</a><a href="#contingencia">♧ &nbsp; Contingencia</a></nav></div><div class="sidebottom"><b>Documento base</b><br>Plan de Operaciones de Salida v4.0<br>CSJ Lima Este · NLPT<br>15 de noviembre de 2026</div></aside>
 <main class="main"><div class="topbar"><div class="breadcrumbs">Programa EJE No Penal / Migración de archivados / <strong>Centro de control</strong></div><div class="topactions"><span class="roundpill" id="connection">● Cargando</span><div class="auth-area"><span id="auth-status" class="chip" role="status">Consulta pública · Edición con Google</span><div id="google-login" hidden></div><button class="btn" id="auth-signout" hidden>Cerrar sesión</button></div><button class="btn" id="refresh">↻ Actualizar</button><button class="btn" id="export">↓ Exportar CSV</button><button class="btn" id="reset-demo" hidden>↺ Reiniciar ensayo</button></div></div>
 <section id="resumen"><div class="hero"><div><div class="tag">Seguimiento ejecutivo · Plan oficial de operaciones v4.0</div><h1>Migración de expedientes archivados</h1><p>Especialidad Laboral (NLPT) · Corte Superior de Justicia de Lima Este. Seguimiento de cumplimiento, responsables, hitos y evidencias por cada actividad del cronograma.</p><div class="hero-badges"><span>📅 Cronograma: 13–26 nov. 2026</span><span>📋 23 filas operativas</span><span>🌎 Horario Perú (UTC−5)</span><span>🔍 Fuente: págs. 12–14</span></div></div><div class="hero-aside"><strong id="headline-progress">0%</strong><small>cumplimiento documentado</small></div></div><div class="notice" id="system-notice">Cargando seguimiento. Los estados de ejecución requieren confirmación y evidencia.</div><div class="grid-kpis" id="kpis"></div>
 <div class="section-title"><div><h2>Panorama de la operación</h2><p>Avance por fase y próximos puntos de control.</p></div></div><div class="two"><div class="card"><h3>Cumplimiento por fase</h3><p class="sub">Verde: finalizadas con evidencia. Ámbar: finalizadas sin evidencia.</p><div id="phase-progress"></div><div class="gate"><h4>🚦 Control Go / No-Go</h4><p>La decisión de inicio está programada para el 16/11 de 15:45 a 16:45. No se interpreta como aprobada sin su acta.</p><div id="gate-status"></div></div></div><div class="card"><h3>Atención prioritaria</h3><p class="sub">Actividades críticas y alertas automáticas, sin presumir incumplimiento por falta de registro.</p><div class="focus-list" id="focus-list"></div></div></div></section>
+<section id="migracion"><div class="section-title"><div><h2>Avance de expedientes migrados</h2>
+<p>Cortes reportados de expedientes cargados exitosamente en EJE, distintos del cumplimiento de actividades.</p></div>
+<button class="btn primary" id="progress-edit" hidden>+ Registrar corte de avance</button></div>
+<div class="card"><div class="mig-head"><div><span class="chip" id="progress-state">Sin reporte</span><div class="mig-big" id="progress-pct">—</div><p class="sub" id="progress-subtitle">Porcentaje pendiente de línea base confirmada y primer corte.</p></div>
+<div class="mig-stats"><div><strong id="progress-migrated">—</strong><small>Migrados exitosamente</small></div>
+<div><strong id="progress-total">—</strong><small>Universo confirmado</small></div>
+<div><strong id="progress-pending">—</strong><small>Pendientes de migrar</small></div>
+<div><strong id="progress-validated">—</strong><small>Validados funcionalmente (si se informa)</small></div></div></div>
+<div class="mig-progress-track" role="progressbar" aria-label="Expedientes migrados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
+<p class="footnote" id="progress-updated">Sin mediciones registradas.</p><div id="progress-source" class="mig-source"></div>
+<p class="footnote">Referencia del Plan de Operaciones v4.0: Carta 331 suma <b>15 277</b> expedientes (págs. 5–6) y la EMD menciona <b>15 278</b> (pág. 5). Son cifras referenciales; el porcentaje solo usa el universo SIJ confirmado y un corte con fuente identificada. No existe conexión directa automática al SIJ/EJE.</p>
+<div class="mig-history"><h3>Últimos cortes registrados</h3><div id="progress-history" class="list-empty">Sin cortes registrados.</div></div>
+</div></section>
 <section id="seguimiento"><div class="section-title"><div><h2>Seguimiento de actividades</h2><p>Selecciona una actividad para registrar su resultado y evidencia.</p></div><div class="section-tools"><button type="button" class="btn directory-btn" id="directory-button">♙ Directorio</button><span class="chip" id="table-count"></span></div></div><div class="card"><div class="table-controls"><input class="field" id="search" placeholder="Buscar actividad, código, responsable, evidencia…" aria-label="Buscar actividades"><select class="field" id="phase-filter" aria-label="Filtrar fase"><option value="">Todas las fases</option><option>Preparación</option><option>Ejecución</option><option>Validación</option><option>Monitoreo y cierre</option></select><select class="field" id="status-filter" aria-label="Filtrar estado"><option value="">Todos los estados</option><option>Sin confirmar</option><option>En curso</option><option>Completada</option><option>Bloqueada</option><option>No aplica</option></select><select class="field" id="owner-filter" aria-label="Filtrar organización"><option value="">Todos los equipos</option><option>SOFTPLAN</option><option>GTI</option><option>PEJENP</option><option>CSJLE</option></select><label class="chip" style="gap:8px"><input type="checkbox" id="critical-only"> Críticas</label></div><div class="tablewrap"><table class="activities-table"><thead><tr><th>Código</th><th>Actividad / fase</th><th>Fecha y horario</th><th>Responsable</th><th>Estado</th><th>Evidencia</th><th>Seguimiento</th></tr></thead><tbody id="task-body"></tbody></table></div><p class="footnote">* «Sin confirmar» significa ausencia de registro de cumplimiento en este tablero. Las fechas y responsables se transcriben del PDF; no se han sustituido por valores estimados. «Crítica» es una priorización para el seguimiento, no una clasificación del documento.</p></div></section>
 <section id="ruta"><div class="section-title"><div><h2>Ruta temporal de la migración</h2><p>Vista referencial por días (13–26 noviembre). Las barras que abarcan varios días no indican ejecución ininterrumpida.</p></div></div><div class="card"><div class="timeline" id="timeline"></div><p class="footnote">Cada barra corresponde a una jornada o ventana; las pausas intermedias no representan ejecución continua. Las validaciones C5.1 y C5.2 están pendientes de confirmación.</p><p class="footnote">Nota de consistencia: el resumen del capítulo 2 (pág. 4) conserva fechas distintas para las validaciones; se utiliza el cronograma detallado del capítulo 5 (págs. 13–14) como referencia de programación, sin asumir aprobación de las fechas.</p></div></section>
 <section id="contingencia"><div class="section-title"><div><h2>Contingencia y rollback</h2><p>Umbrales de activación, niveles de atención y procedimiento de recuperación (págs. 15–17).</p></div></div><div class="protocol"><div class="card"><h3>Umbrales de decisión</h3><p class="sub">Escalamiento y respuesta previstos en el plan.</p><div style="overflow:auto"><table class="mini-table"><thead><tr><th>Umbral</th><th>Evento / tiempo</th><th>Acción responsable</th></tr></thead><tbody id="threshold-body"></tbody></table></div></div><div class="card"><h3>Niveles de tratamiento</h3><p class="sub">El nivel 4 implica restauración del entorno de destino.</p><div style="overflow:auto"><table class="mini-table"><thead><tr><th>Nivel</th><th>Situación</th><th>Decisión / ejecución</th></tr></thead><tbody id="levels-body"></tbody></table></div></div></div><div class="card" style="margin-top:13px"><h3>Procedimiento de rollback · 12 pasos</h3><p class="sub">Secuencia operativa de la sección 6.4. Consulta la secuencia de rollback y los responsables consignados en el plan.</p><div class="roll-steps" id="rollback-list"></div></div></section>
@@ -68,6 +93,7 @@
 <script type="module">
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));const statusList=['Sin confirmar','En curso','Completada','Bloqueada','No aplica'];
 let PLAN=null,records={},evidenceCounts={},connected=false,demo=false,selected=null;const localKey='operaciones-salida-demo-v2';
+let migrationData=null,migrationError='';
 let editorToken=null,editorIdentity=null,editorExpiresAt=0,authConfigured=false,authError='';const canEdit=()=>Boolean(editorToken&&editorIdentity&&Date.now()<editorExpiresAt&&connected&&!demo);
 const now=()=>new Date();const fmt=(v,opts={})=>v?new Intl.DateTimeFormat('es-PE',{timeZone:'America/Lima',day:'2-digit',month:'short',...opts}).format(new Date(v)):'Sin fecha';const formatHours=v=>v?new Intl.DateTimeFormat('es-PE',{timeZone:'America/Lima',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(v)):'—';const stateFor=id=>records[id]||{id,status:'Sin confirmar',notes:'',version:0,evidence_count:0};const evCount=id=>Number(stateFor(id).evidence_count||0);const measurable=a=>!a.is_on_demand&&!a.is_continuous&&stateFor(a.id).status!=='No aplica';const verified=a=>stateFor(a.id).status==='Completada'&&evCount(a.id)>0;const delayed=a=>measurable(a)&&a.end_at&&new Date(a.end_at)<now()&&!verified(a);const sClass=status=>({'Completada':'done','En curso':'active','Bloqueada':'blocked','No aplica':'na'}[status]||'');const statusChip=(a)=>{const s=stateFor(a.id).status;return `<span class="status ${sClass(s)}">${esc(s)}</span>`};
 function updateConnection(msg,type=''){const b=$('connection');b.textContent=(demo?'◌ Ensayo local':connected?'● Neon conectado':'○ Sin servidor');b.style.color=demo?'#815a13':connected?'#097568':'#b14351';$('system-notice').className='notice '+(type||'');$('system-notice').textContent=msg;$('reset-demo').hidden=!demo;}
@@ -150,7 +176,85 @@ function renderTimeline(){
  $('timeline').innerHTML=`<div class="timehead"><div style="font-size:11px;font-weight:800;padding:11px">Actividad</div><div class="dates">${dates}</div></div>`+PLAN.activities.map(a=>`<div class="timerow"><div class="timecaption" title="${esc(a.activity)}"><b>${esc(a.code)}</b> ${esc(a.activity)}</div>${grid(a)}</div>`).join('');
 }
 function renderProtocols(){ $('threshold-body').innerHTML=PLAN.thresholds.map(t=>`<tr><td><strong>${esc(t.code)}</strong></td><td>${esc(t.event)}<br><span class="chip amber">${esc(t.limit)}</span></td><td>${esc(t.action)}</td></tr>`).join('');$('levels-body').innerHTML=PLAN.levels.map(t=>`<tr><td><strong>${esc(t.level)}</strong></td><td>${esc(t.situation)}</td><td>${esc(t.decision)}</td></tr>`).join('');$('rollback-list').innerHTML=PLAN.rollback.map(x=>`<div class="roll-item"><span class="numtag">${esc(x.step)}</span><strong>${esc(x.activity)}</strong><small>Responsable: ${esc(x.owner)}</small><div style="margin-top:5px;color:#64788e">Evidencia: ${esc(x.evidence)}</div></div>`).join('')}
-function render(){if(!PLAN)return;renderKpis();renderPhases();renderTable();renderTimeline();renderAuthStatus()}
+const progressFmt=n=>Number(n).toLocaleString('es-PE');
+function renderProgress(){
+ const button=$('progress-edit');if(button)button.hidden=!canEdit();
+ const latest=migrationData?.latest||null;
+ const has=!!latest;
+ $('progress-state').textContent=migrationError?'Error al consultar':has?'Corte registrado':'Pendiente de reporte';
+ if(!has){
+  for(const id of ['progress-pct','progress-migrated','progress-total','progress-pending','progress-validated'])$(id).textContent='—';
+  $('progress-subtitle').textContent=migrationError?migrationError:'Aún no se registró un corte real con universo SIJ confirmado.';
+  $('progress-fill').style.width='0%';$('progress-track').removeAttribute('aria-valuenow');
+  $('progress-updated').textContent='Sin cifras de migración registradas.';
+  $('progress-source').textContent='';
+ }else{
+  const total=Number(latest.target_count),migrated=Number(latest.migrated_count);
+  const percent=total>0?100*migrated/total:0;
+  $('progress-pct').textContent=percent.toLocaleString('es-PE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+  $('progress-migrated').textContent=progressFmt(migrated);
+  $('progress-total').textContent=progressFmt(total);
+  $('progress-pending').textContent=progressFmt(Math.max(0,total-migrated));
+  $('progress-validated').textContent=latest.validated_count===null?'No informado':progressFmt(latest.validated_count);
+  $('progress-subtitle').textContent='Corte de importación exitosa según fuente reportada';
+  $('progress-fill').style.width=Math.min(100,Math.max(0,percent))+'%';
+  $('progress-track').setAttribute('aria-valuenow',String(Math.round(percent)));
+  $('progress-updated').textContent='Medición: '+fmt(latest.reported_at,{year:'numeric',hour:'2-digit',minute:'2-digit'})+' (Perú) · Registrado por: '+latest.updated_by;
+  const source=$('progress-source');source.textContent='Fuente: '+latest.source_description;
+  if(latest.evidence_url){const a=document.createElement('a');a.href=latest.evidence_url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=' · Ver evidencia';source.appendChild(a)}
+ }
+ const history=migrationData?.history||[];
+ $('progress-history').innerHTML=history.length?history.slice(0,8).map(x=>
+  '<div class="evidence-row"><div><b>'+esc(progressFmt(x.migrated_count))+' / '+esc(progressFmt(x.target_count))+' ('+esc((100*x.migrated_count/x.target_count).toFixed(1))+' %)</b><br><small>'+esc(fmt(x.reported_at,{year:'numeric',hour:'2-digit',minute:'2-digit'}))+' · '+esc(x.updated_by)+' · '+esc(x.source_description)+'</small></div></div>'
+ ).join(''):'<div class="list-empty">No existen cortes registrados.</div>';
+}
+async function loadProgress(){
+ try{migrationData=await api('/api/migration-progress');migrationError=''}
+ catch(e){migrationError='No fue posible consultar los cortes en Neon: '+e.message;migrationData=null}
+ renderProgress();
+}
+function openProgressForm(){
+ if(!canEdit())return;
+ const last=migrationData?.latest||{};
+ const lima=new Date(Date.now()-5*60*60*1000).toISOString().slice(0,16);
+ const val=(x)=>x===null||x===undefined?'':esc(String(x));
+ const content='<p>Registrar un corte real. Se añadirá al historial sin sustituir los anteriores. Los expedientes migrados son los cargados exitosamente en EJE, no solo los exportados del SIJ.</p>'+
+ '<div class="formgrid">'+
+ '<div class="formgroup"><label for="mig-target">Universo definitivo confirmado SIJ *</label><input id="mig-target" type="number" min="1" max="10000000" step="1" value="'+val(last.target_count)+'"></div>'+
+ '<div class="formgroup"><label for="mig-success">Expedientes migrados exitosamente *</label><input id="mig-success" type="number" min="0" max="10000000" step="1" value="'+val(last.migrated_count)+'"></div>'+
+ '<div class="formgroup"><label for="mig-validated">Expedientes validados (opcional)</label><input id="mig-validated" type="number" min="0" step="1" value="'+val(last.validated_count)+'"></div>'+
+ '<div class="formgroup"><label for="mig-date">Fecha y hora del corte (Perú) *</label><input id="mig-date" type="datetime-local" value="'+lima+'"></div>'+
+ '<div class="formgroup wide"><label for="mig-source">Fuente del conteo *</label><input id="mig-source" maxlength="500" placeholder="Ej.: Reporte de migración Softplan del 17/11, corte 06:00" value=""></div>'+
+ '<div class="formgroup wide"><label for="mig-link">Enlace HTTPS a evidencia (opcional)</label><input id="mig-link" type="url" maxlength="2000" placeholder="https://drive.google.com/..."></div>'+
+ '</div><p class="footnote">La cifra de referencia (15 277 o 15 278) no se incorpora automáticamente como universo confirmado. Registra el total conciliado con SIJ.</p>'+
+ '<div class="actions"><span class="formhelp" id="mig-error" role="status"></span><button id="mig-cancel" class="btn">Cancelar</button><button id="mig-save" class="btn primary">Registrar corte</button></div>';
+ openDialog('Registrar avance de expedientes','Migración de archivados NLPT · CSJ Lima Este',content);
+ $('mig-cancel').onclick=closeDialog;
+ $('mig-save').onclick=saveProgress;
+}
+async function saveProgress(){
+ if(!canEdit())return;
+ const button=$('mig-save'),info=$('mig-error');
+ const int=x=>x.trim()===''?NaN:Number(x);
+ const targetCount=int($('mig-target').value),migratedCount=int($('mig-success').value);
+ const vv=$('mig-validated').value.trim();
+ const validatedCount=vv===''?null:int(vv);
+ const sourceDescription=$('mig-source').value.trim();
+ const evidenceUrl=$('mig-link').value.trim();
+ if(!Number.isSafeInteger(targetCount)||targetCount<1||!Number.isSafeInteger(migratedCount)||migratedCount<0||migratedCount>targetCount){info.textContent='Comprueba el universo y el número migrado.';return}
+ if(validatedCount!==null&&(!Number.isSafeInteger(validatedCount)||validatedCount<0||validatedCount>migratedCount)){info.textContent='Los validados no pueden superar los migrados.';return}
+ if(sourceDescription.length<5){info.textContent='Indica una fuente identificable del conteo.';return}
+ let reportedAt;
+ try{reportedAt=validActual($('mig-date').value);if(!reportedAt)throw Error('fecha')}catch{info.textContent='Indica la fecha y hora del corte.';return}
+ button.disabled=true;
+ try{
+  await api('/api/migration-progress',{method:'POST',body:JSON.stringify({targetCount,migratedCount,validatedCount,reportedAt,sourceDescription,evidenceUrl})});
+  closeDialog();await loadProgress();
+ }catch(e){info.textContent='No se pudo registrar el corte: '+e.message}
+ finally{if(button.isConnected)button.disabled=false}
+}
+$('progress-edit').onclick=openProgressForm;
+function render(){if(!PLAN)return;renderKpis();renderPhases();renderTable();renderTimeline();renderAuthStatus();renderProgress()}
 function openDialog(title,sub,html){$('dialog-title').textContent=title;$('dialog-subtitle').textContent=sub;$('dialog-body').innerHTML=html;$('shade').classList.add('show')}
 function closeDialog(){$('shade').classList.remove('show');selected=null}
 const evidenceHtml=xs=>xs.length?xs.map(x=>`<div class="evidence-row"><div><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">🔗 ${esc(x.label)}</a><br><small>${esc(x.created_at?fmt(x.created_at,{year:'numeric'}):'Ensayo local')}</small></div>${x.evidence_id&&canEdit()?`<button class="btn danger" data-remove="${esc(x.evidence_id)}" style="padding:5px">Eliminar</button>`:''}</div>`).join(''):'<div class="list-empty">No se han registrado evidencias.</div>';
@@ -352,6 +456,6 @@ async function initAuth(){
  }catch(e){authError='No se pudo consultar la autenticación';renderAuthStatus()}
 }
 function exportCsv(){const fields=['Código','Fase','Actividad','Fecha plan','Hora inicio plan','Hora fin plan','Responsable','Estado','Evidencias','Registro de ejecución','Registrado por','Actualización','Fecha hora real','Página PDF'];const rows=PLAN.activities.map(a=>{const r=stateFor(a.id);return[a.code,a.phase,a.activity,a.date_label,a.start_label,a.end_label,a.owner,r.status,evCount(a.id),r.notes||'',r.updated_by||'',r.updated_at||'',r.actual_at||'',a.page]});const csv='\uFEFF'+[fields,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='seguimiento_operaciones_salida_202611.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-$('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeDialog()});$('close').onclick=closeDialog;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDialog()});document.addEventListener('click',e=>{const btn=e.target.closest('[data-open]');if(btn)showActivity(btn.dataset.open);const owner=e.target.closest('[data-owners]');if(owner)openOwners(owner.dataset.owners)});$('export').onclick=exportCsv;$('reset-demo').onclick=()=>{if(!demo)return;if(confirm('¿Borrar los datos de ensayo almacenados en este navegador?')){localStorage.removeItem(localKey);records={};render();updateConnection('Ensayo reiniciado. Los registros locales no se comparten con Neon.','err')}};$('refresh').onclick=loadRemote;$('auth-signout').onclick=()=>{editorToken=null;editorIdentity=null;editorExpiresAt=0;authError='';window.google?.accounts?.id?.disableAutoSelect();closeDialog();render()};$('directory-button').onclick=openDirectory;for(const id of ['search','phase-filter','status-filter','owner-filter','critical-only'])$(id).addEventListener(id==='search'?'input':'change',renderTable);document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active')}));
-try{const r=await fetch('./data/plan-operaciones.json',{cache:'no-store'});if(!r.ok)throw Error('Fuente no disponible');PLAN=await r.json();renderProtocols();await loadRemote();await initAuth()}catch(e){$('system-notice').textContent='Error cargando el plan base: '+e.message;$('system-notice').className='notice err'}
+$('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeDialog()});$('close').onclick=closeDialog;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDialog()});document.addEventListener('click',e=>{const btn=e.target.closest('[data-open]');if(btn)showActivity(btn.dataset.open);const owner=e.target.closest('[data-owners]');if(owner)openOwners(owner.dataset.owners)});$('export').onclick=exportCsv;$('reset-demo').onclick=()=>{if(!demo)return;if(confirm('¿Borrar los datos de ensayo almacenados en este navegador?')){localStorage.removeItem(localKey);records={};render();updateConnection('Ensayo reiniciado. Los registros locales no se comparten con Neon.','err')}};$('refresh').onclick=async()=>{await loadRemote();await loadProgress()};$('auth-signout').onclick=()=>{editorToken=null;editorIdentity=null;editorExpiresAt=0;authError='';window.google?.accounts?.id?.disableAutoSelect();closeDialog();render()};$('directory-button').onclick=openDirectory;for(const id of ['search','phase-filter','status-filter','owner-filter','critical-only'])$(id).addEventListener(id==='search'?'input':'change',renderTable);document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active')}));
+try{const r=await fetch('./data/plan-operaciones.json',{cache:'no-store'});if(!r.ok)throw Error('Fuente no disponible');PLAN=await r.json();renderProtocols();await loadRemote();await loadProgress();await initAuth()}catch(e){$('system-notice').textContent='Error cargando el plan base: '+e.message;$('system-notice').className='notice err'}
 </script></body></html>
