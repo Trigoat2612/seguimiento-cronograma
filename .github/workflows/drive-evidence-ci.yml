@@ -4,6 +4,9 @@ on:
     paths:
       - 'api/drive-upload.js'
       - 'api/auth.js'
+      - 'api/migration-progress.js'
+      - 'tests/migration-progress.test.js'
+      - 'db/004_migration_progress.sql'
       - 'lib/editor-auth.js'
       - 'tests/editor-auth.test.js'
       - 'lib/drive-upload.js'
