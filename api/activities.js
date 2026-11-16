@@ -1,3 +1,4 @@
+import {requireEditor} from '../lib/editor-auth.js';
 import {getSql,json,guard,readBody,STATUSES,failure} from '../lib/core.js';
 export default async function handler(req,res){
  if(req.method==='GET'){
@@ -5,7 +6,7 @@ export default async function handler(req,res){
   try{const sql=getSql();const rows=await sql`SELECT id,extract(day from plan_date)::integer AS day,start_minute AS start,end_minute AS "end",title,category AS cat,owner,dependencies AS deps,description AS details,expected_result AS output,(end_minute-start_minute) AS duration,action_icon AS icon,contingency,status,notes AS note,version,updated_at AS updated,completed_at AS completed FROM seguimiento_cronograma.activities ORDER BY plan_date,start_minute,sort_order`;return json(res,200,{activities:rows})}catch(e){return failure(res,e)}
  }
  if(req.method!=='PATCH')return json(res,405,{error:'Método no permitido'});
- if(!guard(req,res,true))return;
+ const editor=await requireEditor(req,res);if(!editor)return;
  try{
   const body=await readBody(req,25000);const {id,status,note,version}=body;
   if(typeof id!=='string'||!/^([A-Z]\d{2})$/.test(id)||!Number.isSafeInteger(version)||version<1)return json(res,400,{error:'Identificador o versión no válida'});
