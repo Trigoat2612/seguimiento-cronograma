@@ -14,7 +14,7 @@
 .phase .meter .blocked,.phase-swatch.blocked{background:#d65362}
 .phase .meter .unconfirmed,.phase-swatch.unconfirmed{background:#dbe4ed}
 .phase .meter .not-applicable,.phase-swatch.not-applicable{background:#98a6b4}
-.phase .phase-counts{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.phase .phase-counts{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:3px}
 .phase .phase-counts span{font-size:10px;color:#5a6d82;white-space:nowrap;display:inline-flex;gap:4px;align-items:baseline}
 .phase .phase-counts b{font-size:14px;font-weight:850}
 .phase .phase-counts .completed b{color:#087f79}
@@ -94,7 +94,7 @@
 <div class="section-title"><div><h2>Panorama de la operación</h2><p>Avance por fase y próximos puntos de control.</p></div></div><div class="two"><div class="card"><h3>Estado de actividades por fase</h3>
 <p class="sub">Completadas y en curso, diferenciadas por fase y estado del cronograma.</p>
 <div class="phase-legend" aria-label="Leyenda de estados">
-  <span><i class="phase-swatch complete"></i>Con evidencia</span>
+  <span><i class="phase-swatch complete"></i>Completadas con evidencia</span>
   <span><i class="phase-swatch active"></i>En curso</span>
   <span><i class="phase-swatch undocumented"></i>Completada sin evidencia</span>
   <span><i class="phase-swatch blocked"></i>Bloqueada</span>
@@ -152,7 +152,7 @@ function phaseSnapshot(name){
 function renderPhases(){
  const phases=['Preparación','Ejecución','Validación','Monitoreo y cierre'];
  const portions=[
-  ['complete','Con evidencia'],
+  ['complete','Completadas con evidencia'],
   ['active','En curso'],
   ['undocumented','Completada sin evidencia'],
   ['blocked','Bloqueada'],
@@ -165,7 +165,7 @@ function renderPhases(){
   const segments=portions.filter(([key])=>x[key]>0).map(([key,label])=>
    `<span class="${key==='notApplicable'?'not-applicable':key}" style="width:${100*x[key]/x.total}%" title="${esc(label)}: ${x[key]} de ${x.total}"></span>`
   ).join('');
-  return `<div class="phase"><div class="label">${esc(name)}<small class="phase-total">${x.total} ${x.total===1?'actividad':'actividades'}</small></div><div class="meter" role="img" aria-label="${esc(description)}">${segments}</div><div class="phase-counts"><span class="completed" title="Completadas con evidencia"><b>${x.complete}</b> con evidencia</span><span class="in-progress" title="Actividades en curso"><b>${x.active}</b> en curso</span></div></div>`;
+  return `<div class="phase"><div class="label">${esc(name)}<small class="phase-total">${x.total} ${x.total===1?'actividad':'actividades'}</small></div><div class="meter" role="img" aria-label="${esc(description)}">${segments}</div><div class="phase-counts"><span class="completed" title="Completadas con evidencia"><b>${x.complete}</b> completadas con evidencia</span><span class="in-progress" title="Actividades en curso"><b>${x.active}</b> en curso</span></div></div>`;
  }).join('');
  const go=PLAN.activities.find(a=>a.id==='go');
  const others=['a2','a5','a6'].map(id=>PLAN.activities.find(a=>a.id===id));
