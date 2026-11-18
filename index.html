@@ -234,7 +234,49 @@ function openDirectory(){
 }
 function ownerMatches(a,owner){const o=a.owner||'';if(owner==='SOFTPLAN')return /\bSP-/.test(o);if(owner==='PEJENP')return /\bPJ-(01|03|15|16|17|18)\b/.test(o);if(owner==='GTI')return /\bPJ-(04|05|06)\b/.test(o);if(owner==='CSJLE')return /\bPJ-(07|08|09|11|13)\b/.test(o);return true}
 function findActivity(id){for(const a of PLAN.activities){if(a.id===id)return a;const t=(a.subtasks||[]).find(t=>t.id===id);if(t)return t;}return null;}
-function renderTable(){const text=$('search').value.toLowerCase().trim(),phase=$('phase-filter').value,stat=$('status-filter').value,owner=$('owner-filter').value,critical=$('critical-only').checked;const list=PLAN.activities.filter(a=>(!text||[a.code,a.activity,a.owner,ownerSearchText(a),a.expected_evidence,a.phase].join(' ').toLowerCase().includes(text))&&(!phase||a.phase===phase)&&(!stat||stateFor(a.id).status===stat)&&(!owner||ownerMatches(a,owner))&&(!critical||a.critical));$('table-count').textContent=`${list.length} / ${PLAN.activities.length} actividades`;$('task-body').innerHTML=list.map(a=>{const s=stateFor(a.id),date=a.date_label==='Sin fecha consignada'?'Sin fecha':a.date_label;return `<tr><td class="nowrap"><strong style="color:#356a8b">${esc(a.code==='—'?'HITO':a.code)}</strong>${a.critical?'<div class="task-detail">◆ Prioritaria</div>':''}</td><td><button class="taskclick task-title" data-open="${a.id}">${esc(a.activity)}</button><div class="task-detail">${esc(a.phase)} · fuente p. ${a.page}</div></td><td class="nowrap"><strong style="font-weight:680">${esc(date)}</strong><div class="task-detail">${esc(a.start_label)} → ${esc(a.end_label)}</div></td><td>${ownerCell(a)}</td><td>${statusChip(a)}${delayed(a)?'<div class="task-detail" style="color:#a06d23">Plazo sin cierre</div>':''}</td><td><span class="chip ${evCount(a.id)?'teal':'amber'}">${evCount(a.id)?`${evCount(a.id)} enlace(s)`:'Sin respaldo'}</span></td><td><button class="btn subtle" data-open="${a.id}">Revisar →</button></td></tr>`}).join('')||'<tr><td colspan="7" class="list-empty">Ninguna actividad coincide con los filtros.</td></tr>'}
+function renderTable(){const text=$('search').value.toLowerCase().trim(),phase=$('phase-filter').value,stat=$('status-filter').value,owner=$('owner-filter').value,critical=$('critical-only').checked;const list=PLAN.activities.filter(a=>(!text||[a.code,a.activity,a.owner,ownerSearchText(a),a.expected_evidence,a.phase].join(' ').toLowerCase().includes(text)||(a.subtasks||[]).some(t=>[t.date_label,t.segment_label,t.activity,t.code].join(' ').toLowerCase().includes(text)))&&(!phase||a.phase===phase)&&(!stat||stateFor(a.id).status===stat)&&(!owner||ownerMatches(a,owner))&&(!critical||a.critical));$('table-count').textContent=`${list.length} / ${PLAN.activities.length} actividades`;$('task-body').innerHTML=list.map(a=>{const s=stateFor(a.id),date=a.date_label==='Sin fecha consignada'?'Sin fecha':a.date_label;return `<tr><td class="nowrap"><strong style="color:#356a8b">${esc(a.code==='—'?'HITO':a.code)}</strong>${a.critical?'<div class="task-detail">◆ Prioritaria</div>':''}</td><td><button class="taskclick task-title" data-open="${a.id}">${esc(a.activity)}</button><div class="task-detail">${esc(a.phase)} · fuente p. ${a.page}</div></td><td class="nowrap"><strong style="font-weight:680">${esc(date)}</strong><div class="task-detail">${esc(a.start_label)} → ${esc(a.end_label)}</div></td><td>${ownerCell(a)}</td><td>${statusChip(a)}${delayed(a)?'<div class="task-detail" style="color:#a06d23">Plazo sin cierre</div>':''}</td><td><span class="chip ${evCount(a.id)?'teal':'amber'}">${evCount(a.id)?`${evCount(a.id)} enlace(s)`:'Sin respaldo'}</span></td><td><button class="btn subtle" data-open="${a.id}">Revisar →</button></td></tr>`}).join('')||'<tr><td colspan="7" class="list-empty">Ninguna actividad coincide con los filtros.</td></tr>';renderTramosRows();}
+
+function renderTramosRows(){
+ const tbody=$('task-body');
+ const baseRows=Array.from(tbody.querySelectorAll('tr'));
+ const term=$('search').value.trim().toLowerCase();
+ const total=PLAN.activities.reduce((sum,a)=>sum+(a.subtasks?.length||0),0);
+ const count=$('table-count');count.textContent+=' · '+total+' tramos';
+ for(const row of baseRows){
+  const opener=row.querySelector('button[data-open]');
+  if(!opener)continue;
+  const main=PLAN.activities.find(a=>a.id===opener.dataset.open);
+  if(!main?.subtasks?.length)continue;
+  const tasks=main.subtasks;
+  const documented=tasks.filter(t=>verified(t)).length;
+  const active=tasks.filter(t=>stateFor(t.id).status==='En curso').length;
+  const button=document.createElement('button');
+  button.className='operational-breakdown-btn';
+  button.type='button';
+  button.dataset.toggleTramos=main.id;
+  const isOpen=expandedOperationalTramos.has(main.id);
+  button.setAttribute('aria-expanded',String(isOpen));
+  button.textContent=(isOpen?'▾ Ocultar ':'▸ Mostrar ')+tasks.length+' tramos por jornada';
+  button.onclick=()=>{
+   if(expandedOperationalTramos.has(main.id))expandedOperationalTramos.delete(main.id);
+   else expandedOperationalTramos.add(main.id);
+   renderTable();
+  };
+  const text=document.createElement('small');
+  text.className='operational-breakdown-counter';
+  text.textContent=documented+'/'+tasks.length+' completados con evidencia · '+active+' en curso';
+  row.children[1].append(button,text);
+  if(!isOpen)continue;
+  const rows=tasks.filter(t=>!term||[main.code,main.activity,main.owner].join(' ').toLowerCase().includes(term)||
+    [t.date_label,t.segment_label,t.activity,t.code].join(' ').toLowerCase().includes(term)).map(t=>{
+   const evidence=evCount(t.id);
+   const evidenceLabel=evidence?evidence+' enlace(s)':'Sin respaldo';
+   return `<tr class="tramo-row" data-parent="${esc(main.id)}"><td><span class="tramo-indicator">↳ T${String(t.subtask_sequence).padStart(2,'0')}</span></td><td><button class="taskclick task-title" data-open="${esc(t.id)}">${esc(t.segment_label)}</button><div class="task-detail">Detalle independiente de ${esc(main.code)} · ${esc(t.phase)}</div></td><td class="nowrap"><strong>${esc(t.date_label)}</strong><div class="task-detail">${esc(t.start_label)} → ${esc(t.end_label)}</div></td><td>${ownerCell(t)}</td><td>${statusChip(t)}${delayed(t)?'<div class="task-detail" style="color:#a06d23">Plazo sin cierre</div>':''}</td><td><span class="chip ${evidence?'teal':'amber'}">${esc(evidenceLabel)}</span></td><td><button class="btn subtle" data-open="${esc(t.id)}">Revisar tramo →</button></td></tr>`;
+  }).join('');
+  row.insertAdjacentHTML('afterend',rows);
+ }
+}
+
 function renderTimeline(){
  const start=new Date('2026-11-13T00:00:00-05:00'),end=new Date('2026-11-27T00:00:00-05:00'),length=end-start;
  const grid=a=>{
