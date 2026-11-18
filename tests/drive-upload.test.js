@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Readable} from 'node:stream';
 import {
-  ACTIVITY_IDS, ALLOWED_MIME, MAX_UPLOAD_BYTES, UploadError,
+  ACTIVITY_IDS, SOURCE_ACTIVITY_IDS, OPERATIONAL_TRAMO_IDS, ALLOWED_MIME, MAX_UPLOAD_BYTES, UploadError,
   safeName, validateFile, clientHash,
   readLimitedFile, driveConfig, getAccessToken, saveToDrive,
   uploaderName
@@ -12,11 +12,15 @@ const pdf=Buffer.from('%PDF-1.7\narchivo de prueba');
 const png=Buffer.from([137,80,78,71,13,10,26,10,0,0,0]);
 const jpeg=Buffer.from([255,216,255,224,0,16,74,70,73,70,0]);
 
-test('23 IDs de actividades del plan, no acepta códigos arbitrarios',()=>{
- assert.equal(ACTIVITY_IDS.size,23);
+test('23 filas oficiales y 48 tramos trazables; no acepta códigos arbitrarios',()=>{
+ assert.equal(SOURCE_ACTIVITY_IDS.size,23);
+ assert.equal(OPERATIONAL_TRAMO_IDS.size,48);
+ assert.equal(ACTIVITY_IDS.size,71);
  assert.equal(ACTIVITY_IDS.has('a3'),true);
  assert.equal(ACTIVITY_IDS.has('c4-r'),true);
  assert.equal(ACTIVITY_IDS.has('otro'),false);
+ assert.equal(ACTIVITY_IDS.has('b2-t01'),true);
+ assert.equal(ACTIVITY_IDS.has('d2-t11'),true);
 });
 test('valida extensión y firma, incluso si el MIME fue falsificado',()=>{
  assert.equal(validateFile(pdf,'application/pdf','acta.pdf').mime,'application/pdf');
