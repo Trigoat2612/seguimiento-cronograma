@@ -85,7 +85,15 @@
 .mig-progress-track>div{height:100%;background:#16a39b;transition:width .2s}
 .mig-source{font-size:12px;color:var(--muted);margin:8px 0}
 .mig-history{margin-top:18px;border-top:1px solid var(--line);padding-top:15px}
-.mig-history h3{font-size:13px}.mig-history .evidence-row{font-size:12px}
+.mig-history .evidence-row{font-size:12px}
+.mig-history-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:8px 0;font-size:13px;font-weight:760;list-style:none;color:var(--text)}
+.mig-history-summary::-webkit-details-marker{display:none}
+.mig-history-summary:focus-visible{outline:3px solid #67b0dd;outline-offset:3px;border-radius:4px}
+.mig-history-action{font-weight:650;font-size:11px;white-space:nowrap;color:#23618b}
+.mig-history-action::before{content:'▸ Mostrar detalle'}
+.mig-history[open] .mig-history-action::before{content:'▾ Ocultar detalle'}
+.mig-history:not([open]) #progress-history{display:none}
+.mig-history[open] #progress-history{margin-top:9px}
 @media(max-width:750px){.mig-stats{width:100%;max-width:none;grid-template-columns:repeat(2,minmax(0,1fr))}.mig-stats strong{font-size:20px}}
 .operational-breakdown-btn{border:1px solid #c6dbe8;border-radius:7px;padding:5px 8px;color:#23618b;background:#edf6fb;font-size:10px;font-weight:760;margin-top:8px}
 .operational-breakdown-btn:hover{background:#e2f0fa}
@@ -125,7 +133,10 @@
 <div class="mig-progress-track" role="progressbar" aria-label="Expedientes migrados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
 <p class="footnote" id="progress-updated">Sin mediciones registradas.</p><p class="footnote migration-eta-method" id="progress-eta-method">La estimación se calculará a partir de cortes reales consecutivos; no confirma la finalización.</p><div id="progress-source" class="mig-source"></div>
 <p class="footnote">Referencia del Plan de Operaciones v4.0: Carta 331 suma <b>15 277</b> expedientes (págs. 5–6) y la EMD menciona <b>15 278</b> (pág. 5). Son cifras referenciales; el porcentaje solo usa el universo SIJ confirmado y un corte con fuente identificada. No existe conexión directa automática al SIJ/EJE.</p>
-<div class="mig-history"><h3>Últimos cortes registrados</h3><div id="progress-history" class="list-empty">Sin cortes registrados.</div></div>
+<details class="mig-history" id="mig-history-details">
+  <summary class="mig-history-summary"><span>Últimos cortes registrados</span><span class="mig-history-action" aria-hidden="true"></span></summary>
+  <div id="progress-history" class="list-empty">Sin cortes registrados.</div>
+</details>
 </div></section>
 <section id="seguimiento"><div class="section-title"><div><h2>Seguimiento de actividades</h2><p>Selecciona una actividad para registrar su resultado y evidencia.</p></div><div class="section-tools"><button type="button" class="btn directory-btn" id="directory-button">♙ Directorio</button><span class="chip" id="table-count"></span></div></div><div class="card"><div class="table-controls"><input class="field" id="search" placeholder="Buscar actividad, código, responsable, evidencia…" aria-label="Buscar actividades"><select class="field" id="phase-filter" aria-label="Filtrar fase"><option value="">Todas las fases</option><option>Preparación</option><option>Ejecución</option><option>Validación</option><option>Monitoreo y cierre</option></select><select class="field" id="status-filter" aria-label="Filtrar estado"><option value="">Todos los estados</option><option>Sin confirmar</option><option>En curso</option><option>Completada</option><option>Bloqueada</option><option>No aplica</option></select><select class="field" id="owner-filter" aria-label="Filtrar organización"><option value="">Todos los equipos</option><option>SOFTPLAN</option><option>GTI</option><option>PEJENP</option><option>CSJLE</option></select><label class="chip" style="gap:8px"><input type="checkbox" id="critical-only"> Críticas</label></div><div class="tablewrap"><table class="activities-table"><thead><tr><th>Código</th><th>Actividad / fase</th><th>Fecha y horario</th><th>Responsable</th><th>Estado</th><th>Evidencia</th><th>Seguimiento</th></tr></thead><tbody id="task-body"></tbody></table></div><p class="footnote">Las actividades multifecha se desglosan en tramos diarios con estado, observaciones y evidencias independientes. Las 23 actividades principales y sus indicadores se conservan sin cambios. Los tramos sin registro están «Sin confirmar», no necesariamente sin ejecutar.</p><p class="footnote">* «Sin confirmar» significa ausencia de registro de cumplimiento en este tablero. Las fechas y responsables se transcriben del PDF; no se han sustituido por valores estimados. «Crítica» es una priorización para el seguimiento, no una clasificación del documento.</p></div></section>
 <section id="ruta"><div class="section-title"><div><h2>Ruta temporal de la migración</h2><p>Vista referencial por días (13–26 noviembre). Las barras que abarcan varios días no indican ejecución ininterrumpida.</p></div></div><div class="card"><div class="timeline" id="timeline"></div><p class="footnote">Cada barra corresponde a una jornada o ventana; las pausas intermedias no representan ejecución continua. Las validaciones C5.1 y C5.2 están pendientes de confirmación.</p><p class="footnote">Nota de consistencia: el resumen del capítulo 2 (pág. 4) conserva fechas distintas para las validaciones; se utiliza el cronograma detallado del capítulo 5 (págs. 13–14) como referencia de programación, sin asumir aprobación de las fechas.</p></div></section>
