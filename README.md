@@ -68,3 +68,15 @@ La sección **Avance de expedientes migrados** muestra el último corte de impor
 El Plan v4.0 muestra cifras referenciales discrepantes: **15 277** en el total del cuadro de Carta 331 (páginas 5–6) frente a **15 278** en la EMD (página 5). Ninguna se utiliza para calcular el porcentaje antes de contar con el universo confirmado en producción. Sin cortes cargados, la sección dice **Pendiente de reporte**, no 0 %.
 
 Se creó exclusivamente la tabla `seguimiento_cronograma.migration_progress_updates` (migración `db/004_migration_progress.sql`) en Neon, proyecto `super-credit-91949836`, rama `br-shy-dawn-b5or7hgh`, sin actualizar tablas de seguimiento previas. `GET /api/migration-progress` es público; `POST /api/migration-progress` exige la sesión Google autorizada por el servidor. El primer corte lo registra un editor con universo confirmado, migrados exitosos, fecha/hora del corte y descripción de fuente; puede añadir expedientes validados y enlace HTTPS como datos opcionales.
+
+
+## Desglose por jornadas de actividades multifecha (18/11/2026)
+
+Se conserva íntegro el inventario de **23 actividades oficiales** y se agrega un **desglose de 48 tramos operativos** en **12 actividades** que abarcan varios días. Cada fila de la tabla permite **Mostrar tramos por jornada** y consultar/editar cada tramo con su propio estado, observación, fecha/hora real, historial y evidencia, utilizando las mismas API y autenticación Google de ocho editores.
+
+- Jornadas nocturnas: los turnos se dividen en cortes por día civil, con **24:00** al final de la jornada y **00:00** al iniciar el día siguiente. Se mantiene la referencia a la ventana correspondiente y los horarios originales.
+- Contingencias y reintentos a demanda: aparecen por día con **«Según evento»** sin inventar horarios ni afirmar ejecución. D2 se desglosa día por día del 16 al 26/11, aunque su naturaleza continua no implica cierre al terminar esa fecha.
+- Los **estados y evidencias existentes** permanecen en sus IDs originales. Ninguna subactividad hereda «En curso» ni «Completada»: comienza en «Sin confirmar» hasta que el equipo autorizado documente su corte.
+- Los indicadores globales y de fase siguen calculándose sobre las 23 filas principales, por lo que no se duplica avance ni se infla el denominador. El avance por tramos se muestra únicamente en su fila principal como `N/M completados con evidencia`.
+- La exportación CSV incluye las filas principales y sus 48 tramos, diferenciados por tipo y actividad principal. Los tramos cuentan con IDs estables en el conjunto autorizado de `lib/drive-upload.js`. No requiere cambio de esquema en Neon; utiliza `operational_status`, `operational_history` y `operational_evidence`.
+- Los desglose diarios son una **herramienta de seguimiento** derivada de las fechas del Plan v4.0, no 48 nuevas filas aprobadas en el documento.
