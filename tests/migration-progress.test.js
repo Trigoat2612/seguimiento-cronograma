@@ -47,3 +47,15 @@ test('El JS del dashboard es sintácticamente válido',()=>{
  assert.ok(script);
  assert.doesNotThrow(()=>new Function('async function probe(){\n'+script+'\n}'));
 });
+
+test('El historial de cortes puede ocultarse y mostrarse sin borrar datos',()=>{
+ const details=html.match(/<details class="mig-history" id="mig-history-details"([^>]*)>([\s\S]*?)<\/details>/);
+ assert.ok(details,'La sección debe utilizar details/summary');
+ assert.doesNotMatch(details[1],/\bopen\b/,'El detalle debe iniciar oculto');
+ assert.match(details[2],/<summary class="mig-history-summary">/);
+ assert.match(details[2],/Últimos cortes registrados/);
+ assert.match(details[2],/id="progress-history"/);
+ assert.match(html,/Mostrar detalle/);
+ assert.match(html,/Ocultar detalle/);
+ assert.match(html,/\$\('progress-history'\)\.innerHTML=/,'Se mantiene la carga del historial en Neon');
+});
