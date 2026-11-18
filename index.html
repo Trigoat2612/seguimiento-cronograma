@@ -95,6 +95,9 @@
 .activities-table .tramo-row td:first-child{border-left:3px solid #4d8ec4}
 .tramo-indicator{display:inline-block;color:#4a78a0;font-size:10px;border:1px solid #caddeb;background:#e7f1fa;border-radius:6px;padding:3px 6px;font-weight:750}
 .tramo-row .task-title{color:#235d89;font-weight:690}
+.mig-stats .migration-estimate-card strong{font-size:clamp(18px,1.7vw,24px);line-height:1.15;overflow-wrap:anywhere}
+.mig-stats .migration-estimate-card .migration-eta-description{font-size:10px;line-height:1.35;color:#60758b;margin-top:3px}
+.migration-eta-method{line-height:1.6;margin:7px 0 13px}
 </style></head><body>
 <div class="app"><aside class="side"><div class="brand"><div class="mark"><img src="/favicon.png" width="38" height="38" alt="" decoding="async"></div><div><strong>EJE No Penal</strong><small>Control de migración</small></div></div><div><div class="side-label">Panel de operaciones</div><nav class="nav" aria-label="Navegación"><a href="#resumen" class="active">◫ &nbsp; Resumen ejecutivo</a><a href="#migracion">◉ &nbsp; Avance de expedientes</a><a href="#seguimiento">▤ &nbsp; Seguimiento</a><a href="#ruta">▥ &nbsp; Ruta temporal</a><a href="#contingencia">♧ &nbsp; Contingencia</a></nav></div><div class="sidebottom"><b>Documento base</b><br>Plan de Operaciones de Salida v4.0<br>CSJ Lima Este · NLPT<br>15 de noviembre de 2026</div></aside>
 <main class="main"><div class="topbar"><div class="breadcrumbs">Programa EJE No Penal / Migración de archivados / <strong>Centro de control</strong></div><div class="topactions"><span class="roundpill" id="connection">● Cargando</span><div class="auth-area"><span id="auth-status" class="chip" role="status">Consulta pública · Edición con Google</span><div id="google-login" hidden></div><button class="btn" id="auth-signout" hidden>Cerrar sesión</button></div><button class="btn" id="refresh">↻ Actualizar</button><button class="btn" id="export">↓ Exportar CSV</button><button class="btn" id="reset-demo" hidden>↺ Reiniciar ensayo</button></div></div>
@@ -118,9 +121,9 @@
 <div class="mig-stats"><div><strong id="progress-migrated">—</strong><small>Migrados exitosamente</small></div>
 <div><strong id="progress-total">—</strong><small>Universo confirmado</small></div>
 <div><strong id="progress-pending">—</strong><small>Pendientes de migrar</small></div>
-<div><strong id="progress-validated">—</strong><small>Validados funcionalmente (si se informa)</small></div></div></div>
+<div class="migration-estimate-card"><strong id="progress-eta">—</strong><small>Tiempo restante estimado</small><small class="migration-eta-description" id="progress-eta-description">Desde el último corte registrado</small></div></div></div>
 <div class="mig-progress-track" role="progressbar" aria-label="Expedientes migrados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
-<p class="footnote" id="progress-updated">Sin mediciones registradas.</p><div id="progress-source" class="mig-source"></div>
+<p class="footnote" id="progress-updated">Sin mediciones registradas.</p><p class="footnote migration-eta-method" id="progress-eta-method">La estimación se calculará a partir de cortes reales consecutivos; no confirma la finalización.</p><div id="progress-source" class="mig-source"></div>
 <p class="footnote">Referencia del Plan de Operaciones v4.0: Carta 331 suma <b>15 277</b> expedientes (págs. 5–6) y la EMD menciona <b>15 278</b> (pág. 5). Son cifras referenciales; el porcentaje solo usa el universo SIJ confirmado y un corte con fuente identificada. No existe conexión directa automática al SIJ/EJE.</p>
 <div class="mig-history"><h3>Últimos cortes registrados</h3><div id="progress-history" class="list-empty">Sin cortes registrados.</div></div>
 </div></section>
@@ -296,17 +299,70 @@ function renderTimeline(){
 }
 function renderProtocols(){ $('threshold-body').innerHTML=PLAN.thresholds.map(t=>`<tr><td><strong>${esc(t.code)}</strong></td><td>${esc(t.event)}<br><span class="chip amber">${esc(t.limit)}</span></td><td>${esc(t.action)}</td></tr>`).join('');$('levels-body').innerHTML=PLAN.levels.map(t=>`<tr><td><strong>${esc(t.level)}</strong></td><td>${esc(t.situation)}</td><td>${esc(t.decision)}</td></tr>`).join('');$('rollback-list').innerHTML=PLAN.rollback.map(x=>`<div class="roll-item"><span class="numtag">${esc(x.step)}</span><strong>${esc(x.activity)}</strong><small>Responsable: ${esc(x.owner)}</small><div style="margin-top:5px;color:#64788e">Evidencia: ${esc(x.evidence)}</div></div>`).join('')}
 const progressFmt=n=>Number(n).toLocaleString('es-PE');
+// Proyección orientativa, no garantía de cierre ni confirmación funcional.
+function forecastMigrationRemaining(history,nowMs=Date.now()){
+ const cuts=Array.isArray(history)?history.slice().sort((a,b)=>Date.parse(b.reported_at)-Date.parse(a.reported_at)):[];
+ if(!cuts.length)return {state:'none',reason:'Sin cortes registrados.'};
+ const latest=cuts[0],total=Number(latest.target_count),migrated=Number(latest.migrated_count),timestamp=Date.parse(latest.reported_at);
+ if(!Number.isSafeInteger(total)||total<=0||!Number.isSafeInteger(migrated)||migrated<0||migrated>total||!Number.isFinite(timestamp))
+  return {state:'insufficient',reason:'El último corte tiene datos inválidos.'};
+ if(migrated===total)return {state:'completed',reason:'El último corte reporta el universo migrado; requiere validación de cierre.'};
+ if(cuts.length<4)return {state:'insufficient',reason:'Se requieren al menos cuatro cortes para estimar la velocidad reciente.'};
+ const sample=cuts.slice(0,4);
+ for(let i=0;i<sample.length;i++){
+  const item=sample[i],stamp=Date.parse(item.reported_at);
+  if(!Number.isSafeInteger(Number(item.target_count))||Number(item.target_count)!==total||
+    !Number.isSafeInteger(Number(item.migrated_count))||
+    Number(item.migrated_count)<0||Number(item.migrated_count)>total||
+    !Number.isFinite(stamp)){
+   return {state:'insufficient',reason:'Cambió el universo o hay cortes no comparables; se necesitan cuatro cortes consistentes.'};
+  }
+  if(i){
+   const newer=sample[i-1],elapsed=Date.parse(newer.reported_at)-stamp;
+   if(elapsed<10*60*1000||elapsed>3*60*60*1000)
+    return {state:'insufficient',reason:'Los últimos cortes no tienen intervalos regulares para proyectar.'};
+   if(Number(newer.migrated_count)<Number(item.migrated_count))
+    return {state:'insufficient',reason:'Se detectó una reducción en los migrados; revisa la conciliación antes de proyectar.'};
+  }
+ }
+ const last=sample.at(-1),elapsedHours=(timestamp-Date.parse(last.reported_at))/3600000;
+ const gain=migrated-Number(last.migrated_count);
+ if(elapsedHours<=0||gain<=0)return {state:'stalled',reason:'Los últimos cortes no muestran crecimiento neto suficiente para estimar el cierre.'};
+ const ratePerHour=gain/elapsedHours;
+ const remaining=total-migrated;
+ const remainingMinutes=Math.ceil(remaining/ratePerHour*60);
+ if(!Number.isFinite(remainingMinutes)||remainingMinutes<1||remainingMinutes>90*24*60)
+  return {state:'insufficient',reason:'El ritmo actual no permite una estimación útil.'};
+ const finishAt=timestamp+remainingMinutes*60000;
+ const ageMinutes=(nowMs-timestamp)/60000;
+ return {
+  state:ageMinutes>120||finishAt<nowMs?'stale':'ok',
+  reason:ageMinutes>120?'No hay un corte reciente (más de 2 horas); actualiza los datos para recalcular.':
+    finishAt<nowMs?'La hora proyectada ya pasó y aún no existe un nuevo corte; no se presume cierre.':'',
+  ratePerHour,remainingMinutes,finishAt,asOf:timestamp,remaining,sampleCount:sample.length,
+  sampleHours:elapsedHours
+ };
+}
+function migrationDuration(minutes){
+ const hours=Math.floor(minutes/60),mins=minutes%60;
+ return hours?(hours+' h'+(mins?' '+mins+' min':'')):mins+' min';
+}
+function migrationDateTime(ms){
+ return new Intl.DateTimeFormat('es-PE',{timeZone:'America/Lima',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(ms));
+}
 function renderProgress(){
  const button=$('progress-edit');if(button)button.hidden=!canEdit();
  const latest=migrationData?.latest||null;
  const has=!!latest;
  $('progress-state').textContent=migrationError?'Error al consultar':has?'Corte registrado':'Pendiente de reporte';
  if(!has){
-  for(const id of ['progress-pct','progress-migrated','progress-total','progress-pending','progress-validated'])$(id).textContent='—';
+  for(const id of ['progress-pct','progress-migrated','progress-total','progress-pending','progress-eta'])$(id).textContent='—';
   $('progress-subtitle').textContent=migrationError?migrationError:'Aún no se registró un corte real con universo SIJ confirmado.';
   $('progress-fill').style.width='0%';$('progress-track').removeAttribute('aria-valuenow');
   $('progress-updated').textContent='Sin cifras de migración registradas.';
   $('progress-source').textContent='';
+  $('progress-eta-description').textContent='Sin cortes comparables';
+  $('progress-eta-method').textContent='A la espera de mediciones reales para generar una proyección.';
  }else{
   const total=Number(latest.target_count),migrated=Number(latest.migrated_count);
   const percent=total>0?100*migrated/total:0;
@@ -314,7 +370,27 @@ function renderProgress(){
   $('progress-migrated').textContent=progressFmt(migrated);
   $('progress-total').textContent=progressFmt(total);
   $('progress-pending').textContent=progressFmt(Math.max(0,total-migrated));
-  $('progress-validated').textContent=latest.validated_count===null?'No informado':progressFmt(latest.validated_count);
+  const estimate=forecastMigrationRemaining(migrationData?.history||[],Date.now());
+  const detail=$('progress-eta-description'),method=$('progress-eta-method');
+  if(estimate.state==='completed'){
+   $('progress-eta').textContent='0 min';
+   detail.textContent='Universo reportado al 100 %';
+   method.textContent='El reporte indica carga completa. Falta verificar la conciliación y el cierre funcional.';
+  }else if(estimate.state==='ok'){
+   $('progress-eta').textContent='≈ '+migrationDuration(estimate.remainingMinutes);
+   detail.textContent='Fin proyectado: '+migrationDateTime(estimate.finishAt)+' (Perú)';
+   method.textContent='Ritmo reciente: '+progressFmt(Math.round(estimate.ratePerHour))+
+    ' expedientes/h · últimos '+estimate.sampleCount+' cortes ('+
+    estimate.sampleHours.toLocaleString('es-PE',{maximumFractionDigits:1})+' h). '+
+    'Tiempo calculado desde el corte de las '+migrationDateTime(estimate.asOf)+
+    '. Proyección orientativa, no una fecha comprometida.';
+  }else{
+   $('progress-eta').textContent=estimate.state==='stale'?'Recalcular':'Sin estimación';
+   detail.textContent=estimate.state==='stale'?'Corte desactualizado':'Requiere cortes comparables';
+   method.textContent=estimate.reason+
+    (estimate.state==='stale'?' Última proyección: '+
+       migrationDateTime(estimate.finishAt)+' (Perú), ritmo '+progressFmt(Math.round(estimate.ratePerHour))+' expedientes/h.':'');
+  }
   $('progress-subtitle').textContent='Corte de importación exitosa según fuente reportada';
   $('progress-fill').style.width=Math.min(100,Math.max(0,percent))+'%';
   $('progress-track').setAttribute('aria-valuenow',String(Math.round(percent)));
